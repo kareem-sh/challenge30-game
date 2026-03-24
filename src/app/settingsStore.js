@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 export const useSettingsStore = create(
   persist(
@@ -33,6 +33,15 @@ export const useSettingsStore = create(
     }),
     {
       name: "challenge30-settings",
+      storage: createJSONStorage(() => localStorage),
     },
   ),
 );
+
+if (typeof window !== "undefined") {
+  window.addEventListener("storage", (event) => {
+    if (event.key === useSettingsStore.persist.getOptions().name) {
+      useSettingsStore.persist.rehydrate();
+    }
+  });
+}

@@ -1,76 +1,208 @@
-import React from "react";
+import { useEffect } from "react";
 import { useGameStore } from "../app/gameStore";
+import OperatorHelpPanel from "../components/OperatorHelpPanel";
 
 export default function Round3() {
   const players = useGameStore((s) => s.players);
+  const current = useGameStore((s) => s.currentPlayer);
+  const setCurrentPlayer = useGameStore((s) => s.setCurrentPlayer);
   const addScore = useGameStore((s) => s.addScore);
   const nextRound = useGameStore((s) => s.nextRound);
-  const question = useGameStore((s) => s.question);
-  const setQuestion = useGameStore((s) => s.setQuestion);
+  const prevRound = useGameStore((s) => s.prevRound);
+
+  const awardPoints = (playerIndex, points) => {
+    setCurrentPlayer(playerIndex);
+    addScore(playerIndex, points);
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.repeat) return;
+
+      if (event.key === "1") {
+        setCurrentPlayer(0);
+        addScore(0, 1);
+      }
+      if (event.key === "2") {
+        setCurrentPlayer(0);
+        addScore(0, 2);
+      }
+      if (event.key === "8") {
+        setCurrentPlayer(1);
+        addScore(1, 1);
+      }
+      if (event.key === "9") {
+        setCurrentPlayer(1);
+        addScore(1, 2);
+      }
+      if (event.key.toLowerCase() === "q") setCurrentPlayer(0);
+      if (event.key.toLowerCase() === "p") setCurrentPlayer(1);
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [addScore, setCurrentPlayer]);
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex justify-between items-end border-b pb-6">
-        <div>
-          <h2 className="text-sm font-bold text-slate-400 uppercase tracking-widest">Operator Console</h2>
-          <h1 className="text-4xl font-black text-slate-900">ROUND 3: SPEED ROUND</h1>
-        </div>
-        <button onClick={nextRound} className="bg-slate-900 text-white px-6 py-2 rounded-xl font-bold hover:bg-slate-800 shadow-lg transition-all">
-          Go to Final Round →
-        </button>
+    <div
+      className="relative mx-auto min-h-[calc(100svh-7rem)] w-full max-w-[1800px] overflow-hidden px-4 py-6 md:px-8 md:py-8 xl:px-10"
+      dir="rtl"
+    >
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute left-[-10%] top-[-14%] h-[30rem] w-[30rem] rounded-full bg-rose-400/14 blur-[130px]" />
+        <div className="absolute bottom-[-18%] right-[-10%] h-[34rem] w-[34rem] rounded-full bg-cyan-500/10 blur-[150px]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(244,63,94,0.08),_transparent_34%),linear-gradient(135deg,rgba(2,6,23,0.97),rgba(17,24,39,0.92))]" />
       </div>
 
-      <div className="bg-white border rounded-3xl p-8 shadow-sm">
-        <label className="block text-xs font-black text-slate-400 uppercase mb-2 tracking-widest">Active Speed Question</label>
-        <input
-          className="w-full text-3xl font-bold bg-slate-50 border-2 border-slate-100 rounded-2xl p-6 focus:border-pink-500 outline-none transition-all"
-          placeholder="Type speed question here..."
-          value={question}
-          onChange={(e) => setQuestion(e.target.value)}
-        />
-      </div>
+      <div className="relative z-10 space-y-6">
+        <section className="rounded-[2rem] border border-white/10 bg-slate-950/80 p-5 shadow-[0_30px_80px_rgba(2,6,23,0.45)] backdrop-blur-xl md:p-7">
+          <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
+            <div className="space-y-4 text-right">
+              <div className="flex flex-wrap items-center justify-end gap-3">
+                <span className="rounded-full border border-rose-300/20 bg-rose-400/10 px-4 py-2 text-[0.7rem] font-black uppercase tracking-[0.35em] text-rose-200">
+                  الجولة 3
+                </span>
+                <span className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-bold text-slate-300">
+                  بدون أسئلة - نقاط مباشرة
+                </span>
+              </div>
+              <div>
+                <h1 className="text-[clamp(2.2rem,4vw,4.8rem)] font-black tracking-tight text-white">
+                  جولة السرعة
+                </h1>
+                <p className="mt-3 max-w-3xl text-base leading-7 text-slate-300 md:text-lg">
+                  اضغط بسرعة على أزرار +1 أو +2 لكل لاعب. النتيجة تُحدَّث فوراً على شاشة
+                  الجمهور مع إبراز اللاعب الحالي.
+                </p>
+              </div>
+            </div>
 
-      <div className="grid grid-cols-2 gap-8">
-        {players.map((p, idx) => (
-          <div key={idx} className="bg-white border-2 border-slate-100 rounded-[40px] p-10 flex flex-col items-center shadow-lg hover:shadow-2xl transition-all border-b-[12px] border-b-slate-200">
-            <h3 className="text-3xl font-black text-slate-900 mb-2">{p.name}</h3>
-            <div className="text-7xl font-black text-pink-600 mb-8 tabular-nums">{p.score}</div>
-            
-            <div className="grid grid-cols-2 gap-4 w-full">
-              <button 
-                onClick={() => addScore(idx, 1)}
-                className="bg-emerald-500 text-white py-8 rounded-3xl font-black text-3xl hover:bg-emerald-600 shadow-[0_12px_0_rgb(5,150,105)] active:shadow-none active:translate-y-[12px] transition-all"
-              >
-                +1
-              </button>
-              <button 
-                onClick={() => addScore(idx, 2)}
-                className="bg-purple-600 text-white py-8 rounded-3xl font-black text-3xl hover:bg-purple-700 shadow-[0_12px_0_rgb(107,33,168)] active:shadow-none active:translate-y-[12px] transition-all"
-              >
-                +2
-              </button>
-              <button 
-                onClick={() => addScore(idx, -1)}
-                className="col-span-2 bg-slate-100 text-slate-400 py-4 rounded-2xl font-black text-xl hover:bg-red-50 hover:text-red-500 transition-all"
-              >
-                CORRECT (-1)
-              </button>
+            <div className="grid gap-3 text-right sm:grid-cols-3 xl:min-w-[620px]">
+              <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
+                <div className="text-[0.65rem] font-black uppercase tracking-[0.3em] text-slate-500">
+                  اللاعب الحالي
+                </div>
+                <div className="mt-3 text-2xl font-black text-white">
+                  {players[current]?.name}
+                </div>
+              </div>
+              <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
+                <div className="text-[0.65rem] font-black uppercase tracking-[0.3em] text-slate-500">
+                  أسرع إضافة
+                </div>
+                <div className="mt-3 text-lg font-black text-white">+1 أو +2</div>
+              </div>
+              <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
+                <div className="text-[0.65rem] font-black uppercase tracking-[0.3em] text-slate-500">
+                  اختصارات
+                </div>
+                <div className="mt-3 text-lg font-black text-white">1 2 | 8 9</div>
+              </div>
             </div>
           </div>
-        ))}
-      </div>
+        </section>
 
-      <div className="bg-pink-50 p-8 rounded-3xl border border-pink-100 flex items-center justify-between">
-         <div className="flex items-center gap-4 text-pink-700">
-            <div className="w-12 h-12 bg-pink-500 rounded-full flex items-center justify-center text-white text-2xl animate-pulse">⚡</div>
-            <div>
-               <p className="font-black uppercase tracking-widest text-sm">Speed Mode Active</p>
-               <p className="font-medium opacity-80">Points are added instantly to the scoreboard. No timers here.</p>
+        <section className="rounded-[2rem] border border-white/10 bg-slate-950/75 p-5 shadow-[0_24px_70px_rgba(15,23,42,0.35)] backdrop-blur-xl md:p-7">
+          <div className="mb-5 text-right">
+            <div className="text-[0.7rem] font-black uppercase tracking-[0.35em] text-slate-400">
+              تحديد اللاعب الحالي
             </div>
-         </div>
-         <div className="flex gap-4">
-            <span className="bg-white px-4 py-2 rounded-lg text-xs font-bold border border-pink-200 text-pink-600">SHORTCUTS: [1, 2] for Player 1 | [8, 9] for Player 2</span>
-         </div>
+            <div className="mt-2 text-sm text-slate-500">
+              اختر اللاعب النشط أولاً أو دع الأزرار تغيّر اللاعب تلقائياً عند احتساب
+              النقاط.
+            </div>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            {players.map((player, index) => (
+              <button
+                key={`active-${index}`}
+                onClick={() => setCurrentPlayer(index)}
+                className={`rounded-[1.8rem] border px-6 py-6 text-right transition ${
+                  current === index
+                    ? "border-rose-300/35 bg-rose-400/10 shadow-[0_20px_45px_rgba(244,63,94,0.18)]"
+                    : "border-white/10 bg-white/5 hover:bg-white/[0.08]"
+                }`}
+              >
+                <div className="text-xs font-black uppercase tracking-[0.32em] text-slate-500">
+                  {current === index ? "نشط الآن" : "تفعيل اللاعب"}
+                </div>
+                <div className="mt-3 text-3xl font-black text-white">{player.name}</div>
+              </button>
+            ))}
+          </div>
+        </section>
+
+        <section className="grid gap-6 xl:grid-cols-2">
+          {players.map((player, index) => {
+            const isActive = current === index;
+
+            return (
+              <article
+                key={index}
+                className={`rounded-[2.2rem] border p-6 shadow-[0_28px_80px_rgba(15,23,42,0.36)] backdrop-blur-xl md:p-8 ${
+                  isActive
+                    ? "border-rose-300/30 bg-rose-400/10"
+                    : "border-white/10 bg-slate-950/75"
+                }`}
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div className="text-right">
+                    <div className="text-xs font-black uppercase tracking-[0.32em] text-slate-500">
+                      {isActive ? "اللاعب الحالي" : "جاهز للنقاط"}
+                    </div>
+                    <h2 className="mt-4 text-[clamp(2.4rem,4vw,4.6rem)] font-black tracking-tight text-white">
+                      {player.name}
+                    </h2>
+                  </div>
+
+                  <div className="rounded-[1.4rem] border border-white/10 bg-black/20 px-5 py-4 text-center">
+                    <div className="text-[0.65rem] font-black uppercase tracking-[0.3em] text-slate-500">
+                      النقاط
+                    </div>
+                    <div className="mt-3 text-[clamp(3.6rem,7vw,6rem)] font-black leading-none text-white tabular-nums">
+                      {player.score}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-8 grid gap-4 md:grid-cols-2">
+                  <button
+                    onClick={() => awardPoints(index, 1)}
+                    className="rounded-[1.9rem] bg-emerald-500 px-6 py-10 text-center text-[clamp(2rem,4vw,3.4rem)] font-black text-white shadow-[0_22px_50px_rgba(16,185,129,0.28)] transition hover:bg-emerald-400 active:scale-[0.98]"
+                  >
+                    +1
+                    <div className="mt-3 text-sm font-bold text-white/80">نقطة سريعة</div>
+                  </button>
+
+                  <button
+                    onClick={() => awardPoints(index, 2)}
+                    className="rounded-[1.9rem] bg-fuchsia-600 px-6 py-10 text-center text-[clamp(2rem,4vw,3.4rem)] font-black text-white shadow-[0_22px_50px_rgba(192,38,211,0.28)] transition hover:bg-fuchsia-500 active:scale-[0.98]"
+                  >
+                    +2
+                    <div className="mt-3 text-sm font-bold text-white/80">أداء ممتاز</div>
+                  </button>
+                </div>
+              </article>
+            );
+          })}
+        </section>
+
+        <OperatorHelpPanel
+          accent="rose"
+          shortcuts={[
+            { keys: "1 / 2", label: "نقطة أو نقطتان للاعب 1" },
+            { keys: "8 / 9", label: "نقطة أو نقطتان للاعب 2" },
+            { keys: "Q / P", label: "تحديد اللاعب الحالي" },
+          ]}
+          tips={[
+            "الأزرار تغيّر اللاعب الحالي تلقائياً عند احتساب النقاط.",
+            "استخدم +2 فقط عندما يكون الأداء واضحاً حتى يبقى القرار سريعاً.",
+            "ثبّت اللاعب الحالي أولاً إذا كنت تريد توجيه الانتباه على شاشة الجمهور.",
+          ]}
+          onPrev={prevRound}
+          onNext={nextRound}
+        />
       </div>
     </div>
   );
