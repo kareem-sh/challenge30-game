@@ -21,6 +21,7 @@ export default function Layout() {
           
           <div className="flex gap-10 items-center">
              <Link to="/settings" className="text-xs font-black text-slate-400 hover:text-white transition-colors tracking-[0.2em]">الإعدادات</Link>
+             <Link to="/questions" className="text-xs font-black text-slate-400 hover:text-white transition-colors tracking-[0.2em]">بنك الأسئلة</Link>
              <Link to="/scoreboard" target="_blank" className="group flex items-center gap-3 bg-white text-black px-6 py-2.5 rounded-2xl font-black text-xs tracking-widest hover:bg-purple-100 transition-all">
                 شاشة العرض 📺
              </Link>

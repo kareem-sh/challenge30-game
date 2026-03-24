@@ -43,6 +43,10 @@ export default function Round2() {
   const successReady = round2DeclaredValue > 0 && round2CorrectCount >= round2DeclaredValue;
   const underHalfReached =
     round2DeclaredValue > 0 && round2CorrectCount < round2DeclaredValue / 2;
+  const round2QuestionBank = (allSettings.questionBank?.round2 || []).filter(
+    (bankQuestion) => bankQuestion.trim().length > 0,
+  );
+  const selectedBankQuestion = round2QuestionBank.includes(question) ? question : "";
 
   const handleTimerToggle = () => {
     if (timeRunning) {
@@ -284,8 +288,35 @@ export default function Round2() {
                   موضوع المزاد
                 </div>
                 <div className="mt-2 text-sm text-slate-500">
-                  اكتب التصنيف الذي سيتنافس اللاعبان على أسمائه.
+                  اختر موضوعاً محفوظاً من بنك الأسئلة أو اكتب التصنيف يدوياً.
                 </div>
+              </div>
+
+              <div className="mb-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto]">
+                <div className="space-y-2 text-right">
+                  <div className="text-[0.68rem] font-black uppercase tracking-[0.32em] text-slate-500">
+                    بنك أسئلة المزاد
+                  </div>
+                  <select
+                    value={selectedBankQuestion}
+                    onChange={(event) => setQuestion(event.target.value)}
+                    className="w-full rounded-[1.2rem] border border-white/10 bg-slate-900/80 px-4 py-4 text-base font-black text-white outline-none transition focus:border-yellow-400/50 focus:ring-4 focus:ring-yellow-400/10"
+                  >
+                    <option value="">اختر سؤالاً محفوظاً أو اكتب يدوياً</option>
+                    {round2QuestionBank.map((bankQuestion, index) => (
+                      <option key={`${bankQuestion}-${index}`} value={bankQuestion}>
+                        {index + 1}. {bankQuestion}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <button
+                  onClick={() => setQuestion("")}
+                  className="rounded-[1.2rem] border border-white/10 bg-white/5 px-5 py-4 text-sm font-black text-white transition hover:bg-white/10 lg:self-end"
+                >
+                  تفريغ الحقل
+                </button>
               </div>
 
               <textarea

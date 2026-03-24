@@ -4,6 +4,7 @@ import Layout from "./components/Layout";
 
 import Start from "./pages/Start";
 import Settings from "./pages/Settings";
+import QuestionsManager from "./pages/QuestionsManager";
 import Round1 from "./pages/Round1";
 import Round2 from "./pages/Round2";
 import Round3 from "./pages/Round3";
@@ -19,6 +20,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <Start /> },
       { path: "settings", element: <Settings /> },
+      { path: "questions", element: <QuestionsManager /> },
       { path: "round", element: <RoundSwitcher /> },
     ],
   },

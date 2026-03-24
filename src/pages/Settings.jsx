@@ -48,6 +48,44 @@ function TextFieldCard({ label, value, onChange, accent = "emerald" }) {
   );
 }
 
+function QuestionsCountCard({ title, count, accent = "emerald", onManage }) {
+  const accentStyles = {
+    cyan: "border-cyan-400/20 bg-cyan-400/10 text-cyan-100",
+    yellow: "border-yellow-300/20 bg-yellow-400/10 text-yellow-100",
+  };
+
+  return (
+    <div className="rounded-[2rem] border border-white/5 bg-[#111315] p-6">
+      <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+        <div className="space-y-3 text-right">
+          <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+            {title}
+          </div>
+          <div className="flex items-center justify-end gap-3">
+            <span
+              className={`rounded-full border px-4 py-2 text-sm font-black ${
+                accentStyles[accent] || accentStyles.cyan
+              }`}
+            >
+              {count} سؤال محفوظ
+            </span>
+            <span className="text-sm font-bold text-slate-400">
+              يتم تحديث العدد تلقائياً من بنك الأسئلة
+            </span>
+          </div>
+        </div>
+
+        <button
+          onClick={onManage}
+          className="rounded-[1.1rem] border border-white/10 bg-white/5 px-5 py-3 text-sm font-black text-white transition hover:bg-white/10"
+        >
+          إدارة الأسئلة
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function Settings() {
   const nav = useNavigate();
   const players = useGameStore((s) => s.players);
@@ -57,6 +95,12 @@ export default function Settings() {
   const settings = useSettingsStore();
   const updateRound = useSettingsStore((s) => s.updateRound);
   const updateRoundName = useSettingsStore((s) => s.updateRoundName);
+  const round1QuestionsCount = settings.questionBank.round1.filter(
+    (question) => question.trim().length > 0,
+  ).length;
+  const round2QuestionsCount = settings.questionBank.round2.filter(
+    (question) => question.trim().length > 0,
+  ).length;
 
   const moveRound = (index, direction) => {
     const nextIndex = index + direction;
@@ -195,6 +239,12 @@ export default function Settings() {
           </span>
           إعدادات الجولة الأولى
         </h2>
+        <QuestionsCountCard
+          title="أسئلة الجولة الأولى"
+          count={round1QuestionsCount}
+          accent="cyan"
+          onManage={() => nav("/questions")}
+        />
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 text-right">
           <FieldCard
             label="الوقت (ثواني)"
@@ -206,12 +256,6 @@ export default function Settings() {
             label="حد الأخطاء"
             value={settings.round1.mistakes}
             onChange={(value) => updateRound("round1", { mistakes: value })}
-            accent="cyan"
-          />
-          <FieldCard
-            label="عدد الأسئلة"
-            value={settings.round1.questionsCount}
-            onChange={(value) => updateRound("round1", { questionsCount: value })}
             accent="cyan"
           />
           <FieldCard
@@ -243,6 +287,12 @@ export default function Settings() {
           </span>
           إعدادات الجولة الثانية
         </h2>
+        <QuestionsCountCard
+          title="أسئلة الجولة الثانية"
+          count={round2QuestionsCount}
+          accent="yellow"
+          onManage={() => nav("/questions")}
+        />
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 text-right">
           <FieldCard
             label="الوقت (ثواني)"
