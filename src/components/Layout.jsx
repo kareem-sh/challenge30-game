@@ -17,11 +17,7 @@ export default function Layout() {
             to="/"
             className="hover:opacity-80 transition-all"
             titleClassName="text-3xl tracking-tight"
-            badge={
-              <span className="mr-2 rounded-full border border-white/5 bg-white/5 px-3 py-1 text-[10px] font-black tracking-widest text-slate-500">
-                شاشة التحكم
-              </span>
-            }
+           
           />
           
           <div className="flex gap-10 items-center">

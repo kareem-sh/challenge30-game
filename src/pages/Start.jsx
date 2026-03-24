@@ -20,13 +20,7 @@ export default function Start() {
       </div>
 
       <div className="relative z-10 flex flex-col items-center max-w-4xl w-full">
-        <div className="mb-4">
-          <span className="bg-white/5 border border-white/10 px-6 py-2 rounded-full text-purple-400 text-xs font-black tracking-[0.4em]">
-            منصة التشغيل الرسمية
-          </span>
-        </div>
-
-        <h1 className="mb-8 relative">
+        <h1 className="mb-16 relative">
           <BrandLogo
             stacked
             className="w-full"
