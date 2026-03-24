@@ -1,5 +1,7 @@
 import { useEffect } from "react";
 import { useGameStore } from "../app/gameStore";
+import { useSettingsStore } from "../app/settingsStore";
+import { getRoundName } from "../app/roundUtils";
 import OperatorHelpPanel from "../components/OperatorHelpPanel";
 
 export default function Round3() {
@@ -9,6 +11,9 @@ export default function Round3() {
   const addScore = useGameStore((s) => s.addScore);
   const nextRound = useGameStore((s) => s.nextRound);
   const prevRound = useGameStore((s) => s.prevRound);
+  const settings = useSettingsStore((s) => s.round3);
+  const allSettings = useSettingsStore();
+  const roundTitle = getRoundName(allSettings, 3);
 
   const awardPoints = (playerIndex, points) => {
     setCurrentPlayer(playerIndex);
@@ -21,19 +26,19 @@ export default function Round3() {
 
       if (event.key === "1") {
         setCurrentPlayer(0);
-        addScore(0, 1);
+        addScore(0, settings.singlePoint);
       }
       if (event.key === "2") {
         setCurrentPlayer(0);
-        addScore(0, 2);
+        addScore(0, settings.doublePoint);
       }
       if (event.key === "8") {
         setCurrentPlayer(1);
-        addScore(1, 1);
+        addScore(1, settings.singlePoint);
       }
       if (event.key === "9") {
         setCurrentPlayer(1);
-        addScore(1, 2);
+        addScore(1, settings.doublePoint);
       }
       if (event.key.toLowerCase() === "q") setCurrentPlayer(0);
       if (event.key.toLowerCase() === "p") setCurrentPlayer(1);
@@ -41,7 +46,7 @@ export default function Round3() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [addScore, setCurrentPlayer]);
+  }, [addScore, setCurrentPlayer, settings.doublePoint, settings.singlePoint]);
 
   return (
     <div
@@ -68,7 +73,7 @@ export default function Round3() {
               </div>
               <div>
                 <h1 className="text-[clamp(2.2rem,4vw,4.8rem)] font-black tracking-tight text-white">
-                  جولة السرعة
+                  {roundTitle}
                 </h1>
                 <p className="mt-3 max-w-3xl text-base leading-7 text-slate-300 md:text-lg">
                   اضغط بسرعة على أزرار +1 أو +2 لكل لاعب. النتيجة تُحدَّث فوراً على شاشة
@@ -90,7 +95,9 @@ export default function Round3() {
                 <div className="text-[0.65rem] font-black uppercase tracking-[0.3em] text-slate-500">
                   أسرع إضافة
                 </div>
-                <div className="mt-3 text-lg font-black text-white">+1 أو +2</div>
+                <div className="mt-3 text-lg font-black text-white">
+                  +{settings.singlePoint} أو +{settings.doublePoint}
+                </div>
               </div>
               <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
                 <div className="text-[0.65rem] font-black uppercase tracking-[0.3em] text-slate-500">
@@ -168,18 +175,18 @@ export default function Round3() {
 
                 <div className="mt-8 grid gap-4 md:grid-cols-2">
                   <button
-                    onClick={() => awardPoints(index, 1)}
+                    onClick={() => awardPoints(index, settings.singlePoint)}
                     className="rounded-[1.9rem] bg-emerald-500 px-6 py-10 text-center text-[clamp(2rem,4vw,3.4rem)] font-black text-white shadow-[0_22px_50px_rgba(16,185,129,0.28)] transition hover:bg-emerald-400 active:scale-[0.98]"
                   >
-                    +1
+                    +{settings.singlePoint}
                     <div className="mt-3 text-sm font-bold text-white/80">نقطة سريعة</div>
                   </button>
 
                   <button
-                    onClick={() => awardPoints(index, 2)}
+                    onClick={() => awardPoints(index, settings.doublePoint)}
                     className="rounded-[1.9rem] bg-fuchsia-600 px-6 py-10 text-center text-[clamp(2rem,4vw,3.4rem)] font-black text-white shadow-[0_22px_50px_rgba(192,38,211,0.28)] transition hover:bg-fuchsia-500 active:scale-[0.98]"
                   >
-                    +2
+                    +{settings.doublePoint}
                     <div className="mt-3 text-sm font-bold text-white/80">أداء ممتاز</div>
                   </button>
                 </div>
@@ -191,8 +198,14 @@ export default function Round3() {
         <OperatorHelpPanel
           accent="rose"
           shortcuts={[
-            { keys: "1 / 2", label: "نقطة أو نقطتان للاعب 1" },
-            { keys: "8 / 9", label: "نقطة أو نقطتان للاعب 2" },
+            {
+              keys: "1 / 2",
+              label: `+${settings.singlePoint} أو +${settings.doublePoint} للاعب 1`,
+            },
+            {
+              keys: "8 / 9",
+              label: `+${settings.singlePoint} أو +${settings.doublePoint} للاعب 2`,
+            },
             { keys: "Q / P", label: "تحديد اللاعب الحالي" },
           ]}
           tips={[

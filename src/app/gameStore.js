@@ -13,7 +13,7 @@ export const useGameStore = create(
       currentPlayer: 0,
       question: "",
       round1QuestionIndex: 1,
-      round1PassUsed: [false, false],
+      round1PassUsed: [0, 0],
       roundIndex: 0,
       roundsOrder: [1, 2, 3, 4],
       timeRunning: false,
@@ -97,10 +97,10 @@ export const useGameStore = create(
         })),
       markRound1PassUsed: (playerIndex) => {
         const round1PassUsed = [...get().round1PassUsed];
-        round1PassUsed[playerIndex] = true;
+        round1PassUsed[playerIndex] = Number(round1PassUsed[playerIndex] || 0) + 1;
         set({ round1PassUsed });
       },
-      resetRound1Passes: () => set({ round1PassUsed: [false, false] }),
+      resetRound1Passes: () => set({ round1PassUsed: [0, 0] }),
 
       addScore: (player, pts) => {
         const players = [...get().players];
@@ -132,7 +132,7 @@ export const useGameStore = create(
           isQuestionStarted: false,
           question: "",
           round1QuestionIndex: 1,
-          round1PassUsed: [false, false],
+          round1PassUsed: [0, 0],
           round2Phase: "bidding",
           round2DeclaredValue: 0,
           round2CorrectCount: 0,
@@ -153,7 +153,7 @@ export const useGameStore = create(
           isQuestionStarted: false,
           question: "",
           round1QuestionIndex: 1,
-          round1PassUsed: [false, false],
+          round1PassUsed: [0, 0],
           round2Phase: "bidding",
           round2DeclaredValue: 0,
           round2CorrectCount: 0,
@@ -176,7 +176,7 @@ export const useGameStore = create(
           isQuestionStarted: false,
           question: "",
           round1QuestionIndex: 1,
-          round1PassUsed: [false, false],
+          round1PassUsed: [0, 0],
           round2Phase: "bidding",
           round2DeclaredValue: 0,
           round2CorrectCount: 0,
@@ -192,7 +192,15 @@ export const useGameStore = create(
         get().resetStrikes();
       },
 
-      setRoundsOrder: (order) => set({ roundsOrder: order }),
+      setRoundsOrder: (order) => {
+        const normalized = order
+          .filter((roundNumber) => [1, 2, 3, 4].includes(roundNumber))
+          .filter((roundNumber, index, array) => array.indexOf(roundNumber) === index);
+
+        if (normalized.length !== 4) return;
+
+        set({ roundsOrder: normalized });
+      },
 
       startTimer: () => {
         const state = get();
@@ -302,7 +310,7 @@ export const useGameStore = create(
           isQuestionStarted: false,
           globalTimer: initialTime,
           globalTimerStartedAt: null,
-          round1PassUsed: [false, false],
+          round1PassUsed: [0, 0],
           round2Phase: "bidding",
           round2DeclaredValue: 0,
           round2CorrectCount: 0,
@@ -327,7 +335,7 @@ export const useGameStore = create(
           currentPlayer: 0,
           question: "",
           round1QuestionIndex: 1,
-          round1PassUsed: [false, false],
+          round1PassUsed: [0, 0],
           round2Phase: "bidding",
           round2DeclaredValue: 0,
           round2CorrectCount: 0,

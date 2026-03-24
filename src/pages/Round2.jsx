@@ -1,6 +1,7 @@
 import { useEffect, useEffectEvent } from "react";
 import { useGameStore } from "../app/gameStore";
 import { useSettingsStore } from "../app/settingsStore";
+import { getRoundName } from "../app/roundUtils";
 import RoundTimerDisplay from "../components/RoundTimerDisplay";
 import OperatorHelpPanel from "../components/OperatorHelpPanel";
 
@@ -32,10 +33,12 @@ export default function Round2() {
   const setRound2PlayerDeclaration = useGameStore((s) => s.setRound2PlayerDeclaration);
   const setRound2LastOutcome = useGameStore((s) => s.setRound2LastOutcome);
   const settings = useSettingsStore((s) => s.round2);
+  const allSettings = useSettingsStore();
 
   const other = current === 0 ? 1 : 0;
   const isBiddingPhase = round2Phase === "bidding";
   const isQuestionReady = question.trim().length > 0;
+  const roundTitle = getRoundName(allSettings, 2);
   const challengePoints = Math.floor(round2DeclaredValue / settings.namesForPoint);
   const successReady = round2DeclaredValue > 0 && round2CorrectCount >= round2DeclaredValue;
   const underHalfReached =
@@ -237,7 +240,7 @@ export default function Round2() {
               </div>
               <div>
                 <h1 className="text-[clamp(2.2rem,4vw,4.8rem)] font-black tracking-tight text-white">
-                  جولة المزاد
+                  {roundTitle}
                 </h1>
                 <p className="mt-3 max-w-3xl text-base leading-7 text-slate-300 md:text-lg">
                   شاشة تشغيل واضحة لإدارة الإعلان، تثبيت اللاعب الذي قبل التحدي،

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useGameStore } from "../app/gameStore";
 import { useSettingsStore } from "../app/settingsStore";
+import { getRoundName } from "../app/roundUtils";
 import useSound from "use-sound";
 import Timer from "../components/Timer";
 import useRealtimeGlobalTimer from "../app/useRealtimeGlobalTimer";
@@ -23,7 +24,9 @@ export default function Scoreboard() {
   const realtimeGlobalTimer = useRealtimeGlobalTimer();
 
   const currentRound = roundsOrder[roundIndex];
+  const currentRoundName = getRoundName(settings, currentRound);
   const mistakeLimit = currentRound === 1 ? settings.round1.mistakes : 3;
+  const round1PassLimit = Math.max(1, Number(settings.round1.passCount) || 1);
   const round1Progress = Math.min(
     100,
     (realtimeGlobalTimer / Math.max(settings.round1.time, 1)) * 100,
@@ -121,10 +124,7 @@ export default function Scoreboard() {
             </span>
           </div>
           <h1 className="text-5xl md:text-8xl font-black tracking-tighter italic leading-none uppercase">
-            {currentRound === 1 && "لعبة الأسماء"}
-            {currentRound === 2 && "المزاد"}
-            {currentRound === 3 && "جولة السرعة"}
-            {currentRound === 4 && "تحدي الصور"}
+            {currentRoundName}
           </h1>
         </div>
 
@@ -182,7 +182,7 @@ export default function Scoreboard() {
                   round4ActivePlayerExpired ? "text-red-300" : "text-cyan-200"
                 }`}
               >
-                {round4ActivePlayerExpired ? "انتهى الوقت" : "تحدي الصور"}
+                {round4ActivePlayerExpired ? "انتهى الوقت" : currentRoundName}
               </div>
             </div>
           </div>
@@ -295,7 +295,11 @@ export default function Scoreboard() {
                   </div>
                   {currentRound === 1 && (
                     <div className="w-full max-w-xs flex justify-center">
-                      <PassMeter used={round1PassUsed[index]} variant="audience" />
+                      <PassMeter
+                        usedCount={Number(round1PassUsed[index] || 0)}
+                        totalCount={round1PassLimit}
+                        variant="audience"
+                      />
                     </div>
                   )}
                 </div>
@@ -356,7 +360,7 @@ export default function Scoreboard() {
             {currentRound === 3
               ? "وضع السرعة"
               : currentRound === 4
-                ? "تحدي الصور"
+                ? currentRoundName
                 : "التحدي الحالي"}
           </span>
           <span className="text-2xl md:text-5xl font-bold text-white tracking-tight">

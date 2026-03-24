@@ -4,12 +4,15 @@ import Round3 from "./Round3";
 import Round4 from "./Round4";
 
 import { useGameStore } from "../app/gameStore";
+import { useSettingsStore } from "../app/settingsStore";
+import { getRoundName } from "../app/roundUtils";
 
 export default function RoundSwitcher() {
   const order = useGameStore((s) => s.roundsOrder);
   const index = useGameStore((s) => s.roundIndex);
   const isRoundActive = useGameStore((s) => s.isRoundActive);
   const startRound = useGameStore((s) => s.startRound);
+  const settings = useSettingsStore();
   
   const r = order[index];
 
@@ -39,10 +42,7 @@ export default function RoundSwitcher() {
           <span className="bg-purple-600/20 text-purple-400 px-6 py-2 rounded-full text-xs font-black tracking-widest uppercase">جاهز للجولة؟</span>
           <h1 className="text-[10rem] font-black text-white italic tracking-tighter leading-none">الجولة {r}</h1>
           <h2 className="text-4xl font-bold text-slate-500">
-            {r === 1 && "لعبة الأسماء"}
-            {r === 2 && "المزاد العلني"}
-            {r === 3 && "جولة السرعة القصوى"}
-            {r === 4 && "تحدي الصور"}
+            {getRoundName(settings, r)}
           </h2>
         </div>
 

@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useGameStore } from "../app/gameStore";
 import { useSettingsStore } from "../app/settingsStore";
+import { getRoundName } from "../app/roundUtils";
 import OperatorHelpPanel from "../components/OperatorHelpPanel";
 
 export default function Round4() {
@@ -15,6 +16,7 @@ export default function Round4() {
   const prevRound = useGameStore((s) => s.prevRound);
   const running = useGameStore((s) => s.timeRunning);
   const settings = useSettingsStore((s) => s.round4);
+  const allSettings = useSettingsStore();
 
   useEffect(() => {
     const intervalId = window.setInterval(() => {
@@ -59,6 +61,7 @@ export default function Round4() {
 
   const activePlayer = players[current];
   const activePlayerExpired = activePlayer?.time === 0;
+  const roundTitle = getRoundName(allSettings, 4);
 
   return (
     <div
@@ -80,12 +83,12 @@ export default function Round4() {
                   الجولة 4
                 </span>
                 <span className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-bold text-slate-300">
-                  تحدي الصور
+                  {roundTitle}
                 </span>
               </div>
               <div>
                 <h1 className="text-[clamp(2.2rem,4vw,4.8rem)] font-black tracking-tight text-white">
-                  تحدي الصور
+                  {roundTitle}
                 </h1>
                 <p className="mt-3 max-w-3xl text-base leading-7 text-slate-300 md:text-lg">
                   نفس الواجهة الأساسية، لكن مع توضيح أقوى للاعب الحالي، تقدّم الوقت،

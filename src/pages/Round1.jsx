@@ -1,6 +1,7 @@
 import { useEffect, useEffectEvent } from "react";
 import { useGameStore } from "../app/gameStore";
 import { useSettingsStore } from "../app/settingsStore";
+import { getRoundName } from "../app/roundUtils";
 import RoundTimerDisplay from "../components/RoundTimerDisplay";
 import StrikeMeter from "../components/StrikeMeter";
 import PassMeter from "../components/PassMeter";
@@ -33,6 +34,7 @@ export default function Round1() {
   const pauseTimer = useGameStore((s) => s.pauseTimer);
   const triggerMistakeSound = useGameStore((s) => s.triggerMistakeSound);
   const settings = useSettingsStore((s) => s.round1);
+  const allSettings = useSettingsStore();
 
   const other = current === 0 ? 1 : 0;
   const isQuestionReady = question.trim().length > 0;
@@ -41,7 +43,10 @@ export default function Round1() {
     (player) => player.strikes >= settings.mistakes,
   );
   const winnerIndex = resolvedPlayerIndex === -1 ? -1 : resolvedPlayerIndex === 0 ? 1 : 0;
-  const currentPlayerHasPass = !round1PassUsed[current];
+  const passLimit = Math.max(1, Number(settings.passCount) || 1);
+  const roundTitle = getRoundName(allSettings, 1);
+  const currentPlayerPassUsed = Number(round1PassUsed[current] || 0);
+  const currentPlayerHasPass = currentPlayerPassUsed < passLimit;
 
   const prepareTimer = () => {
     resetGlobalTimer(settings.time);
@@ -199,7 +204,7 @@ export default function Round1() {
               </div>
               <div>
                 <h1 className="text-[clamp(2.2rem,4vw,4.8rem)] font-black tracking-tight text-white">
-                  لعبة الأسماء
+                  {roundTitle}
                 </h1>
                 <p className="mt-3 max-w-3xl text-base leading-7 text-slate-300 md:text-lg">
                   واجهة تشغيل سريعة وواضحة للتقني، مع عرض حيّ للدور الحالي،
@@ -228,6 +233,13 @@ export default function Round1() {
                 <div className="mt-3 text-lg font-black text-white">
                   {settings.normalPoint} / {settings.perfectPoint}
                 </div>
+              </div>
+              <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4 sm:col-span-3 xl:col-span-1">
+                <div className="text-[0.65rem] font-black uppercase tracking-[0.3em] text-slate-500">
+                  عدد التمريرات
+                </div>
+                <div className="mt-3 text-3xl font-black text-white">{settings.passCount}</div>
+                <div className="mt-1 text-xs font-bold text-slate-400">لكل لاعب في السؤال</div>
               </div>
             </div>
           </div>
@@ -340,15 +352,18 @@ export default function Round1() {
                     </div>
 
                     <div className="mt-5 flex justify-end">
-                      <PassMeter used={round1PassUsed[index]} />
+                      <PassMeter
+                        usedCount={Number(round1PassUsed[index] || 0)}
+                        totalCount={passLimit}
+                      />
                     </div>
 
                     <div className="mt-8 rounded-[1.4rem] border border-white/10 bg-black/20 px-5 py-4 text-sm text-slate-300">
                       {isWinner
                         ? `حصل على ${players[index].score} نقطة إجمالية بعد هذا السؤال.`
                         : player.strikes === 0
-                          ? "بدون أخطاء حتى الآن."
-                          : `سجّل ${player.strikes} من ${settings.mistakes} أخطاء.`}
+                          ? `بدون أخطاء. استُخدم ${Number(round1PassUsed[index] || 0)} من ${passLimit} تمريرات.`
+                          : `سجّل ${player.strikes} من ${settings.mistakes} أخطاء، واستُخدم ${Number(round1PassUsed[index] || 0)} من ${passLimit} تمريرات.`}
                     </div>
                   </article>
                 );
@@ -400,7 +415,9 @@ export default function Round1() {
                   >
                     تمرير الدور إلى {players[other].name}
                     <div className="mt-2 text-xs font-semibold text-violet-100/80">
-                      {currentPlayerHasPass ? "P" : "استُخدمت الفرصة"}
+                      {currentPlayerHasPass
+                        ? `P - متبقي ${passLimit - currentPlayerPassUsed}`
+                        : "استُنفدت التمريرات"}
                     </div>
                   </button>
 
@@ -473,7 +490,7 @@ export default function Round1() {
           shortcuts={[
             { keys: "M", label: "تسجيل خطأ على اللاعب الحالي" },
             { keys: "S", label: "تبديل اللاعب" },
-            { keys: "P", label: "تمرير الدور إن كانت الفرصة متاحة" },
+            { keys: "P", label: `تمرير الدور حتى ${passLimit} مرة` },
             { keys: "Space", label: "تشغيل أو إيقاف المؤقت" },
             { keys: "Enter", label: "إنهاء السؤال الحالي" },
           ]}
