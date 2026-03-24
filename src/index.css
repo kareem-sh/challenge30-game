@@ -1,11 +1,90 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "Cairo";
+  src: url("/fonts/Cairo-400.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Cairo";
+  src: url("/fonts/Cairo-500.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Cairo";
+  src: url("/fonts/Cairo-700.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Cairo";
+  src: url("/fonts/Cairo-800.ttf") format("truetype");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Cairo";
+  src: url("/fonts/Cairo-900.ttf") format("truetype");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --app-font: "Cairo", "Segoe UI", Tahoma, sans-serif;
+}
+
+html {
+  direction: rtl;
+}
+
 body {
   margin: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   direction: rtl;
-  font-family: system-ui, -apple-system, sans-serif;
+  text-rendering: optimizeLegibility;
+  font-family: var(--app-font);
+  line-height: 1.45;
+}
+
+body,
+button,
+input,
+textarea,
+select {
+  font-family: var(--app-font);
+}
+
+/* Arabic text looks better without aggressive tracking utilities. */
+[dir="rtl"] :where(
+  div,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p,
+  span,
+  button,
+  a,
+  label,
+  textarea,
+  input
+) {
+  letter-spacing: 0 !important;
+  font-kerning: normal;
 }
 
 #root {

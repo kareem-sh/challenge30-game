@@ -35,9 +35,9 @@ export default function Scoreboard() {
   const round4ActivePlayerExpired =
     currentRound === 4 && players[currentPlayer] && players[currentPlayer].time === 0;
 
-  const [playMistake] = useSound("https://assets.mixkit.co/active_storage/sfx/2003/2003-preview.mp3");
+  const [playMistake] = useSound("/sounds/mistake.mp3");
   const [playFail, { stop: stopFail }] = useSound(
-    "https://assets.mixkit.co/active_storage/sfx/1003/1003-preview.mp3",
+    "/sounds/fail.mp3",
   );
 
   const lastMistakeTrigger = useRef(mistakeTrigger);
