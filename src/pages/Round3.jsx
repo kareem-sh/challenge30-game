@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useGameStore } from "../app/gameStore";
 import { useSettingsStore } from "../app/settingsStore";
 import { getRoundName } from "../app/roundUtils";
+import { eventMatchesShortcut, formatShortcutLabel } from "../app/shortcutUtils";
 import OperatorHelpPanel from "../components/OperatorHelpPanel";
 
 export default function Round3() {
@@ -14,6 +15,8 @@ export default function Round3() {
   const settings = useSettingsStore((s) => s.round3);
   const allSettings = useSettingsStore();
   const roundTitle = getRoundName(allSettings, 3);
+  const shortcuts = settings.shortcuts;
+  const globalShortcuts = allSettings.globalShortcuts;
 
   const awardPoints = (playerIndex, points) => {
     setCurrentPlayer(playerIndex);
@@ -24,29 +27,49 @@ export default function Round3() {
     const handleKeyDown = (event) => {
       if (event.repeat) return;
 
-      if (event.key === "1") {
+      if (eventMatchesShortcut(event, shortcuts.playerOneSingle)) {
         setCurrentPlayer(0);
         addScore(0, settings.singlePoint);
+        return;
       }
-      if (event.key === "2") {
+      if (eventMatchesShortcut(event, shortcuts.playerOneDouble)) {
         setCurrentPlayer(0);
         addScore(0, settings.doublePoint);
+        return;
       }
-      if (event.key === "8") {
+      if (eventMatchesShortcut(event, shortcuts.playerTwoSingle)) {
         setCurrentPlayer(1);
         addScore(1, settings.singlePoint);
+        return;
       }
-      if (event.key === "9") {
+      if (eventMatchesShortcut(event, shortcuts.playerTwoDouble)) {
         setCurrentPlayer(1);
         addScore(1, settings.doublePoint);
+        return;
       }
-      if (event.key.toLowerCase() === "q") setCurrentPlayer(0);
-      if (event.key.toLowerCase() === "p") setCurrentPlayer(1);
+      if (eventMatchesShortcut(event, globalShortcuts.playerOne)) {
+        setCurrentPlayer(0);
+        return;
+      }
+      if (eventMatchesShortcut(event, globalShortcuts.playerTwo)) {
+        setCurrentPlayer(1);
+      }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [addScore, setCurrentPlayer, settings.doublePoint, settings.singlePoint]);
+  }, [
+    addScore,
+    setCurrentPlayer,
+    settings.doublePoint,
+    settings.singlePoint,
+    shortcuts.playerOneSingle,
+    shortcuts.playerOneDouble,
+    shortcuts.playerTwoSingle,
+    shortcuts.playerTwoDouble,
+    globalShortcuts.playerOne,
+    globalShortcuts.playerTwo,
+  ]);
 
   return (
     <div
@@ -103,7 +126,9 @@ export default function Round3() {
                 <div className="text-[0.65rem] font-black uppercase tracking-[0.3em] text-slate-500">
                   اختصارات
                 </div>
-                <div className="mt-3 text-lg font-black text-white">1 2 | 8 9</div>
+                <div className="mt-3 text-lg font-black text-white">
+                  {formatShortcutLabel(shortcuts.playerOneSingle)} {formatShortcutLabel(shortcuts.playerOneDouble)} | {formatShortcutLabel(shortcuts.playerTwoSingle)} {formatShortcutLabel(shortcuts.playerTwoDouble)}
+                </div>
               </div>
             </div>
           </div>
@@ -199,14 +224,17 @@ export default function Round3() {
           accent="rose"
           shortcuts={[
             {
-              keys: "1 / 2",
+              keys: `${formatShortcutLabel(shortcuts.playerOneSingle)} / ${formatShortcutLabel(shortcuts.playerOneDouble)}`,
               label: `+${settings.singlePoint} أو +${settings.doublePoint} للاعب 1`,
             },
             {
-              keys: "8 / 9",
+              keys: `${formatShortcutLabel(shortcuts.playerTwoSingle)} / ${formatShortcutLabel(shortcuts.playerTwoDouble)}`,
               label: `+${settings.singlePoint} أو +${settings.doublePoint} للاعب 2`,
             },
-            { keys: "Q / P", label: "تحديد اللاعب الحالي" },
+            {
+              keys: `${formatShortcutLabel(globalShortcuts.playerOne)} / ${formatShortcutLabel(globalShortcuts.playerTwo)}`,
+              label: "تحديد اللاعب الحالي",
+            },
           ]}
           tips={[
             "الأزرار تغيّر اللاعب الحالي تلقائياً عند احتساب النقاط.",

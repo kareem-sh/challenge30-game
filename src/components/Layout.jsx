@@ -1,4 +1,5 @@
 import { Outlet, Link, useLocation } from "react-router-dom";
+import BrandLogo from "./BrandLogo";
 
 export default function Layout() {
   const location = useLocation();
@@ -12,12 +13,16 @@ export default function Layout() {
       {/* Premium Navigation */}
       {!isHome && (
         <nav className="bg-[#111315]/80 backdrop-blur-xl border-b border-white/5 px-10 py-5 flex justify-between items-center sticky top-0 z-50 shadow-2xl">
-          <Link to="/" className="text-3xl font-black italic tracking-tighter hover:opacity-80 transition-all flex items-center gap-2">
-            CHALLENGE<span className="text-purple-500">30</span>
-            <span className="mr-2 text-[10px] font-black tracking-widest text-slate-500 py-1 px-3 bg-white/5 rounded-full border border-white/5">
-              شاشة التحكم
-            </span>
-          </Link>
+          <BrandLogo
+            to="/"
+            className="hover:opacity-80 transition-all"
+            titleClassName="text-3xl tracking-tight"
+            badge={
+              <span className="mr-2 rounded-full border border-white/5 bg-white/5 px-3 py-1 text-[10px] font-black tracking-widest text-slate-500">
+                شاشة التحكم
+              </span>
+            }
+          />
           
           <div className="flex gap-10 items-center">
              <Link to="/settings" className="text-xs font-black text-slate-400 hover:text-white transition-colors tracking-[0.2em]">الإعدادات</Link>

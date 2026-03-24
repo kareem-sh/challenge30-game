@@ -2,6 +2,7 @@ import { useEffect, useEffectEvent } from "react";
 import { useGameStore } from "../app/gameStore";
 import { useSettingsStore } from "../app/settingsStore";
 import { getRoundName } from "../app/roundUtils";
+import { eventMatchesShortcut, formatShortcutLabel } from "../app/shortcutUtils";
 import RoundTimerDisplay from "../components/RoundTimerDisplay";
 import StrikeMeter from "../components/StrikeMeter";
 import PassMeter from "../components/PassMeter";
@@ -45,6 +46,8 @@ export default function Round1() {
   const winnerIndex = resolvedPlayerIndex === -1 ? -1 : resolvedPlayerIndex === 0 ? 1 : 0;
   const passLimit = Math.max(1, Number(settings.passCount) || 1);
   const roundTitle = getRoundName(allSettings, 1);
+  const shortcuts = settings.shortcuts;
+  const globalShortcuts = allSettings.globalShortcuts;
   const currentPlayerPassUsed = Number(round1PassUsed[current] || 0);
   const currentPlayerHasPass = currentPlayerPassUsed < passLimit;
   const round1QuestionBank = (allSettings.questionBank?.round1 || []).filter(
@@ -137,27 +140,31 @@ export default function Round1() {
       return;
     }
 
-    if (event.key.toLowerCase() === "m") {
+    if (eventMatchesShortcut(event, globalShortcuts.markMistake)) {
       event.preventDefault();
       handleStrike();
+      return;
     }
 
-    if (event.key.toLowerCase() === "s") {
+    if (eventMatchesShortcut(event, shortcuts.switchPlayer)) {
       event.preventDefault();
       handleSwitch();
+      return;
     }
 
-    if (event.key.toLowerCase() === "p") {
+    if (eventMatchesShortcut(event, shortcuts.passTurn)) {
       event.preventDefault();
       handlePassTurn();
+      return;
     }
 
-    if (event.key === " ") {
+    if (eventMatchesShortcut(event, globalShortcuts.timerToggle)) {
       event.preventDefault();
       handleToggleTimer();
+      return;
     }
 
-    if (event.key === "Enter") {
+    if (eventMatchesShortcut(event, globalShortcuts.confirmAction)) {
       event.preventDefault();
       finishCurrentQuestion();
     }
@@ -427,7 +434,9 @@ export default function Round1() {
                   className="rounded-[1.7rem] bg-gradient-to-l from-rose-600 to-orange-400 px-6 py-6 text-right text-2xl font-black text-white shadow-[0_24px_50px_rgba(244,63,94,0.3)] transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   خطأ على {players[current].name}
-                  <div className="mt-2 text-sm font-semibold text-white/80">الاختصار M</div>
+                  <div className="mt-2 text-sm font-semibold text-white/80">
+                    الاختصار {formatShortcutLabel(globalShortcuts.markMistake)}
+                  </div>
                 </button>
 
                 <div className="grid gap-4 md:grid-cols-2">
@@ -437,7 +446,9 @@ export default function Round1() {
                     className="rounded-[1.5rem] border border-cyan-400/20 bg-cyan-400/10 px-5 py-5 text-right text-lg font-black text-cyan-100 transition hover:bg-cyan-400/15 disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     تبديل إلى {players[other].name}
-                    <div className="mt-2 text-xs font-semibold text-cyan-200/80">S</div>
+                    <div className="mt-2 text-xs font-semibold text-cyan-200/80">
+                      {formatShortcutLabel(shortcuts.switchPlayer)}
+                    </div>
                   </button>
 
                   <button
@@ -448,7 +459,7 @@ export default function Round1() {
                     تمرير الدور إلى {players[other].name}
                     <div className="mt-2 text-xs font-semibold text-violet-100/80">
                       {currentPlayerHasPass
-                        ? `P - متبقي ${passLimit - currentPlayerPassUsed}`
+                        ? `${formatShortcutLabel(shortcuts.passTurn)} - متبقي ${passLimit - currentPlayerPassUsed}`
                         : "استُنفدت التمريرات"}
                     </div>
                   </button>
@@ -459,7 +470,9 @@ export default function Round1() {
                     className="rounded-[1.5rem] border border-amber-300/20 bg-amber-300/10 px-5 py-5 text-right text-lg font-black text-amber-100 transition hover:bg-amber-300/15 disabled:cursor-not-allowed disabled:opacity-40 md:col-span-2"
                   >
                     {timeRunning ? "إيقاف مؤقت" : "تشغيل أو استئناف"}
-                    <div className="mt-2 text-xs font-semibold text-amber-100/80">Space</div>
+                    <div className="mt-2 text-xs font-semibold text-amber-100/80">
+                      {formatShortcutLabel(globalShortcuts.timerToggle)}
+                    </div>
                   </button>
                 </div>
 
@@ -468,7 +481,9 @@ export default function Round1() {
                   className="rounded-[1.5rem] border border-emerald-300/20 bg-emerald-400/10 px-5 py-5 text-right text-lg font-black text-emerald-100 transition hover:bg-emerald-400/15"
                 >
                   إنهاء السؤال الحالي والانتقال لرقم {Math.min(round1QuestionIndex + 1, settings.questionsCount)}
-                  <div className="mt-2 text-xs font-semibold text-emerald-100/80">Enter</div>
+                  <div className="mt-2 text-xs font-semibold text-emerald-100/80">
+                    {formatShortcutLabel(globalShortcuts.confirmAction)}
+                  </div>
                 </button>
 
                 <button
@@ -520,11 +535,11 @@ export default function Round1() {
         <OperatorHelpPanel
           accent="cyan"
           shortcuts={[
-            { keys: "M", label: "تسجيل خطأ على اللاعب الحالي" },
-            { keys: "S", label: "تبديل اللاعب" },
-            { keys: "P", label: `تمرير الدور حتى ${passLimit} مرة` },
-            { keys: "Space", label: "تشغيل أو إيقاف المؤقت" },
-            { keys: "Enter", label: "إنهاء السؤال الحالي" },
+            { keys: formatShortcutLabel(globalShortcuts.markMistake), label: "تسجيل خطأ على اللاعب الحالي" },
+            { keys: formatShortcutLabel(shortcuts.switchPlayer), label: "تبديل اللاعب" },
+            { keys: formatShortcutLabel(shortcuts.passTurn), label: `تمرير الدور حتى ${passLimit} مرة` },
+            { keys: formatShortcutLabel(globalShortcuts.timerToggle), label: "تشغيل أو إيقاف المؤقت" },
+            { keys: formatShortcutLabel(globalShortcuts.confirmAction), label: "إنهاء السؤال الحالي" },
           ]}
           tips={[
             "ابدأ المؤقت فقط بعد كتابة السؤال حتى يظهر فوراً على شاشة الجمهور.",

@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useGameStore } from "../app/gameStore";
+import BrandLogo from "../components/BrandLogo";
 
 export default function Start() {
   const nav = useNavigate();
@@ -25,15 +26,18 @@ export default function Start() {
           </span>
         </div>
 
-        <h1 className="text-[12rem] font-black leading-none tracking-tighter italic mb-8 relative">
-          <span className="text-white">CHALLENGE</span>
-          <span className="bg-gradient-to-br from-purple-400 to-pink-600 bg-clip-text text-transparent">30</span>
+        <h1 className="mb-8 relative">
+          <BrandLogo
+            stacked
+            className="w-full"
+            titleClassName="text-[clamp(4.8rem,12vw,10rem)] leading-none tracking-tight"
+          />
           {/* Decorative lines */}
           <div className="absolute -bottom-4 left-0 w-full h-2 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
         </h1>
 
         <p className="text-slate-400 text-2xl font-medium mb-16 text-center max-w-2xl leading-relaxed">
-          منصة تشغيل وعرض متكاملة لإدارة لعبة Challenge 30 في البث المباشر.
+          منصة تشغيل وعرض متكاملة لإدارة لعبة تحدي الثَّلاثين في البث المباشر.
           هل أنت جاهز للبدء؟
         </p>
 

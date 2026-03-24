@@ -2,6 +2,7 @@ import { useEffect, useEffectEvent } from "react";
 import { useGameStore } from "../app/gameStore";
 import { useSettingsStore } from "../app/settingsStore";
 import { getRoundName } from "../app/roundUtils";
+import { eventMatchesShortcut, formatShortcutLabel } from "../app/shortcutUtils";
 import RoundTimerDisplay from "../components/RoundTimerDisplay";
 import OperatorHelpPanel from "../components/OperatorHelpPanel";
 
@@ -39,6 +40,8 @@ export default function Round2() {
   const isBiddingPhase = round2Phase === "bidding";
   const isQuestionReady = question.trim().length > 0;
   const roundTitle = getRoundName(allSettings, 2);
+  const shortcuts = settings.shortcuts;
+  const globalShortcuts = allSettings.globalShortcuts;
   const challengePoints = Math.floor(round2DeclaredValue / settings.namesForPoint);
   const successReady = round2DeclaredValue > 0 && round2CorrectCount >= round2DeclaredValue;
   const underHalfReached =
@@ -143,48 +146,53 @@ export default function Round2() {
       return;
     }
 
-    if (event.key === "+" || event.key === "=") {
+    if (eventMatchesShortcut(event, shortcuts.incrementValue)) {
       event.preventDefault();
       if (isBiddingPhase) {
         setRound2DeclaredValue(round2DeclaredValue + 1);
       } else {
         setRound2CorrectCount(round2CorrectCount + 1);
       }
+      return;
     }
 
-    if (event.key === "-") {
+    if (eventMatchesShortcut(event, shortcuts.decrementValue)) {
       event.preventDefault();
       if (isBiddingPhase) {
         setRound2DeclaredValue(round2DeclaredValue - 1);
       } else {
         setRound2CorrectCount(round2CorrectCount - 1);
       }
+      return;
     }
 
-    if (event.key === "1") {
+    if (eventMatchesShortcut(event, globalShortcuts.playerOne)) {
       event.preventDefault();
       if (isBiddingPhase && isQuestionReady && round2DeclaredValue > 0) {
         startChallenge(0);
         return;
       }
       setCurrentPlayer(0);
+      return;
     }
 
-    if (event.key === "2") {
+    if (eventMatchesShortcut(event, globalShortcuts.playerTwo)) {
       event.preventDefault();
       if (isBiddingPhase && isQuestionReady && round2DeclaredValue > 0) {
         startChallenge(1);
         return;
       }
       setCurrentPlayer(1);
+      return;
     }
 
-    if (event.key === " ") {
+    if (eventMatchesShortcut(event, globalShortcuts.timerToggle)) {
       event.preventDefault();
       handleTimerToggle();
+      return;
     }
 
-    if (event.key === "Enter") {
+    if (eventMatchesShortcut(event, globalShortcuts.confirmAction)) {
       event.preventDefault();
       if (isBiddingPhase) {
         startChallenge(current);
@@ -194,19 +202,22 @@ export default function Round2() {
       if (successReady) {
         handleSuccess();
       }
+      return;
     }
 
-    if (!isBiddingPhase && event.key.toLowerCase() === "m") {
+    if (!isBiddingPhase && eventMatchesShortcut(event, globalShortcuts.markMistake)) {
       event.preventDefault();
       handleFailure("mistake");
+      return;
     }
 
-    if (!isBiddingPhase && event.key.toLowerCase() === "h") {
+    if (!isBiddingPhase && eventMatchesShortcut(event, shortcuts.markUnderHalf)) {
       event.preventDefault();
       handleFailure("underHalf");
+      return;
     }
 
-    if (event.key.toLowerCase() === "r") {
+    if (eventMatchesShortcut(event, shortcuts.backToBidding)) {
       event.preventDefault();
       handleBackToBidding();
     }
@@ -662,11 +673,20 @@ export default function Round2() {
         <OperatorHelpPanel
           accent="yellow"
           shortcuts={[
-            { keys: "+ / -", label: "رفع أو خفض العدد الحالي" },
-            { keys: "1 / 2", label: "تحديد اللاعب أو بدء التحدي له" },
-            { keys: "Space", label: "تشغيل أو إيقاف المؤقت" },
-            { keys: "Enter", label: "بدء التحدي أو اعتماد النجاح" },
-            { keys: "M / H / R", label: "خطأ / أقل من النصف / عودة للمزايدة" },
+            {
+              keys: `${formatShortcutLabel(shortcuts.incrementValue)} / ${formatShortcutLabel(shortcuts.decrementValue)}`,
+              label: "رفع أو خفض العدد الحالي",
+            },
+            {
+              keys: `${formatShortcutLabel(globalShortcuts.playerOne)} / ${formatShortcutLabel(globalShortcuts.playerTwo)}`,
+              label: "تحديد اللاعب أو بدء التحدي له",
+            },
+            { keys: formatShortcutLabel(globalShortcuts.timerToggle), label: "تشغيل أو إيقاف المؤقت" },
+            { keys: formatShortcutLabel(globalShortcuts.confirmAction), label: "بدء التحدي أو اعتماد النجاح" },
+            {
+              keys: `${formatShortcutLabel(globalShortcuts.markMistake)} / ${formatShortcutLabel(shortcuts.markUnderHalf)} / ${formatShortcutLabel(shortcuts.backToBidding)}`,
+              label: "خطأ / أقل من النصف / عودة للمزايدة",
+            },
           ]}
           tips={[
             "الاختصارات تتوقف تلقائياً أثناء الكتابة داخل موضوع المزاد.",

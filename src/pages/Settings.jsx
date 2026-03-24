@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useGameStore } from "../app/gameStore";
 import { useSettingsStore } from "../app/settingsStore";
 import { DEFAULT_ROUND_NAMES, ROUND_KEY_BY_NUMBER, getRoundName } from "../app/roundUtils";
+import { formatShortcutLabel } from "../app/shortcutUtils";
 
 const FIELD_ACCENTS = {
   emerald: "focus:border-emerald-500/50",
@@ -86,6 +87,48 @@ function QuestionsCountCard({ title, count, accent = "emerald", onManage }) {
   );
 }
 
+function ShortcutFieldCard({ label, value, onChange, hint }) {
+  return (
+    <div className="bg-[#111315] p-6 rounded-3xl border border-white/5 space-y-2">
+      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+        {label}
+      </label>
+      <input
+        type="text"
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className="w-full bg-[#0a0b0c] border border-white/5 rounded-xl p-4 font-black text-xl text-white outline-none transition-all focus:border-purple-500/40"
+      />
+      <div className="text-xs font-bold text-slate-500">
+        {hint || `العرض الحالي: ${formatShortcutLabel(value)}`}
+      </div>
+    </div>
+  );
+}
+
+function ShortcutsSection({ title, shortcuts, onChange }) {
+  return (
+    <div className="space-y-4">
+      <div className="rounded-[2rem] border border-white/5 bg-[#111315] p-6">
+        <div className="text-sm font-black text-white">{title}</div>
+        <div className="mt-2 text-sm font-bold text-slate-400">
+          اكتب حرفاً واحداً أو اسماً خاصاً مثل `space` أو `enter`.
+        </div>
+      </div>
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+        {shortcuts.map((shortcut) => (
+          <ShortcutFieldCard
+            key={shortcut.key}
+            label={shortcut.label}
+            value={shortcut.value}
+            onChange={(value) => onChange(shortcut.key, value)}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function Settings() {
   const nav = useNavigate();
   const players = useGameStore((s) => s.players);
@@ -114,6 +157,24 @@ export default function Settings() {
     nextOrder[index] = nextOrder[nextIndex];
     nextOrder[nextIndex] = temp;
     setOrder(nextOrder);
+  };
+
+  const updateRoundShortcut = (roundKey, shortcutKey, value) => {
+    updateRound(roundKey, {
+      shortcuts: {
+        ...settings[roundKey].shortcuts,
+        [shortcutKey]: value,
+      },
+    });
+  };
+
+  const updateGlobalShortcut = (shortcutKey, value) => {
+    useSettingsStore.setState((state) => ({
+      globalShortcuts: {
+        ...state.globalShortcuts,
+        [shortcutKey]: value,
+      },
+    }));
   };
 
   return (
@@ -234,8 +295,48 @@ export default function Settings() {
 
       <section className="space-y-6">
         <h2 className="text-xl font-black text-white flex items-center gap-3 flex-row-reverse">
-          <span className="w-8 h-8 bg-cyan-500/10 text-cyan-500 rounded-lg flex items-center justify-center text-sm">
+          <span className="w-8 h-8 bg-violet-500/10 text-violet-400 rounded-lg flex items-center justify-center text-sm">
             04
+          </span>
+          الاختصارات العامة
+        </h2>
+        <ShortcutsSection
+          title="اختصارات مشتركة بين الجولات"
+          shortcuts={[
+            {
+              key: "markMistake",
+              label: "تسجيل خطأ",
+              value: settings.globalShortcuts.markMistake,
+            },
+            {
+              key: "timerToggle",
+              label: "تشغيل أو إيقاف المؤقت",
+              value: settings.globalShortcuts.timerToggle,
+            },
+            {
+              key: "confirmAction",
+              label: "اعتماد أو إنهاء الإجراء",
+              value: settings.globalShortcuts.confirmAction,
+            },
+            {
+              key: "playerOne",
+              label: "اختيار اللاعب الأول",
+              value: settings.globalShortcuts.playerOne,
+            },
+            {
+              key: "playerTwo",
+              label: "اختيار اللاعب الثاني",
+              value: settings.globalShortcuts.playerTwo,
+            },
+          ]}
+          onChange={updateGlobalShortcut}
+        />
+      </section>
+
+      <section className="space-y-6">
+        <h2 className="text-xl font-black text-white flex items-center gap-3 flex-row-reverse">
+          <span className="w-8 h-8 bg-cyan-500/10 text-cyan-500 rounded-lg flex items-center justify-center text-sm">
+            05
           </span>
           إعدادات الجولة الأولى
         </h2>
@@ -278,12 +379,28 @@ export default function Settings() {
             accent="cyan"
           />
         </div>
+        <ShortcutsSection
+          title="اختصارات الجولة الأولى"
+          shortcuts={[
+            {
+              key: "switchPlayer",
+              label: "تبديل اللاعب",
+              value: settings.round1.shortcuts.switchPlayer,
+            },
+            {
+              key: "passTurn",
+              label: "تمرير الدور",
+              value: settings.round1.shortcuts.passTurn,
+            },
+          ]}
+          onChange={(shortcutKey, value) => updateRoundShortcut("round1", shortcutKey, value)}
+        />
       </section>
 
       <section className="space-y-6">
         <h2 className="text-xl font-black text-white flex items-center gap-3 flex-row-reverse">
           <span className="w-8 h-8 bg-yellow-500/10 text-yellow-500 rounded-lg flex items-center justify-center text-sm">
-            05
+            06
           </span>
           إعدادات الجولة الثانية
         </h2>
@@ -319,12 +436,38 @@ export default function Settings() {
             accent="yellow"
           />
         </div>
+        <ShortcutsSection
+          title="اختصارات الجولة الثانية"
+          shortcuts={[
+            {
+              key: "incrementValue",
+              label: "رفع العدد",
+              value: settings.round2.shortcuts.incrementValue,
+            },
+            {
+              key: "decrementValue",
+              label: "خفض العدد",
+              value: settings.round2.shortcuts.decrementValue,
+            },
+            {
+              key: "markUnderHalf",
+              label: "أقل من النصف",
+              value: settings.round2.shortcuts.markUnderHalf,
+            },
+            {
+              key: "backToBidding",
+              label: "عودة للمزايدة",
+              value: settings.round2.shortcuts.backToBidding,
+            },
+          ]}
+          onChange={(shortcutKey, value) => updateRoundShortcut("round2", shortcutKey, value)}
+        />
       </section>
 
       <section className="space-y-6">
         <h2 className="text-xl font-black text-white flex items-center gap-3 flex-row-reverse">
           <span className="w-8 h-8 bg-rose-500/10 text-rose-500 rounded-lg flex items-center justify-center text-sm">
-            06
+            07
           </span>
           إعدادات الجولة الثالثة
         </h2>
@@ -342,12 +485,38 @@ export default function Settings() {
             accent="rose"
           />
         </div>
+        <ShortcutsSection
+          title="اختصارات الجولة الثالثة"
+          shortcuts={[
+            {
+              key: "playerOneSingle",
+              label: "اللاعب 1 - زر النقطة",
+              value: settings.round3.shortcuts.playerOneSingle,
+            },
+            {
+              key: "playerOneDouble",
+              label: "اللاعب 1 - زر النقطتين",
+              value: settings.round3.shortcuts.playerOneDouble,
+            },
+            {
+              key: "playerTwoSingle",
+              label: "اللاعب 2 - زر النقطة",
+              value: settings.round3.shortcuts.playerTwoSingle,
+            },
+            {
+              key: "playerTwoDouble",
+              label: "اللاعب 2 - زر النقطتين",
+              value: settings.round3.shortcuts.playerTwoDouble,
+            },
+          ]}
+          onChange={(shortcutKey, value) => updateRoundShortcut("round3", shortcutKey, value)}
+        />
       </section>
 
       <section className="space-y-6">
         <h2 className="text-xl font-black text-white flex items-center gap-3 flex-row-reverse">
           <span className="w-8 h-8 bg-sky-500/10 text-sky-500 rounded-lg flex items-center justify-center text-sm">
-            07
+            08
           </span>
           إعدادات الجولة الرابعة
         </h2>
@@ -359,6 +528,32 @@ export default function Settings() {
             accent="sky"
           />
         </div>
+        <ShortcutsSection
+          title="اختصارات الجولة الرابعة"
+          shortcuts={[
+            {
+              key: "switchPlayer",
+              label: "تبديل اللاعب",
+              value: settings.round4.shortcuts.switchPlayer,
+            },
+            {
+              key: "startTimer",
+              label: "تشغيل المؤقت",
+              value: settings.round4.shortcuts.startTimer,
+            },
+            {
+              key: "pauseTimer",
+              label: "إيقاف مؤقت",
+              value: settings.round4.shortcuts.pauseTimer,
+            },
+            {
+              key: "resetTimer",
+              label: "إعادة الضبط",
+              value: settings.round4.shortcuts.resetTimer,
+            },
+          ]}
+          onChange={(shortcutKey, value) => updateRoundShortcut("round4", shortcutKey, value)}
+        />
       </section>
 
       <div className="bg-gradient-to-br from-purple-900/40 to-black rounded-[40px] p-12 text-center text-white space-y-6 shadow-2xl border border-white/5">

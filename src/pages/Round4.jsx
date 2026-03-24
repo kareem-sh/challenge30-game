@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useGameStore } from "../app/gameStore";
 import { useSettingsStore } from "../app/settingsStore";
 import { getRoundName } from "../app/roundUtils";
+import { eventMatchesShortcut, formatShortcutLabel } from "../app/shortcutUtils";
 import OperatorHelpPanel from "../components/OperatorHelpPanel";
 
 export default function Round4() {
@@ -17,6 +18,7 @@ export default function Round4() {
   const running = useGameStore((s) => s.timeRunning);
   const settings = useSettingsStore((s) => s.round4);
   const allSettings = useSettingsStore();
+  const shortcuts = settings.shortcuts;
 
   useEffect(() => {
     const intervalId = window.setInterval(() => {
@@ -28,22 +30,23 @@ export default function Round4() {
 
   useEffect(() => {
     const handleKeyDown = (event) => {
-      const key = event.key.toLowerCase();
-
-      if (event.code === "Space") {
+      if (eventMatchesShortcut(event, shortcuts.switchPlayer)) {
         event.preventDefault();
         switchPlayer();
+        return;
       }
 
-      if (key === "p") {
+      if (eventMatchesShortcut(event, shortcuts.pauseTimer)) {
         pauseTimer();
+        return;
       }
 
-      if (key === "s") {
+      if (eventMatchesShortcut(event, shortcuts.startTimer)) {
         startTimer();
+        return;
       }
 
-      if (key === "r") {
+      if (eventMatchesShortcut(event, shortcuts.resetTimer)) {
         pauseTimer();
         resetTimes(settings.time);
       }
@@ -51,7 +54,17 @@ export default function Round4() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [pauseTimer, resetTimes, settings.time, startTimer, switchPlayer]);
+  }, [
+    pauseTimer,
+    resetTimes,
+    settings.time,
+    startTimer,
+    switchPlayer,
+    shortcuts.switchPlayer,
+    shortcuts.pauseTimer,
+    shortcuts.startTimer,
+    shortcuts.resetTimer,
+  ]);
 
   const format = (time) => {
     const minutes = Math.floor(time / 60);
@@ -238,7 +251,9 @@ export default function Round4() {
               {running ? "إيقاف مؤقت" : "تشغيل"}
             </div>
             <div className="mt-3 text-sm font-bold opacity-80">
-              {running ? "تجميد الوقت الحالي" : "بدء العداد للاعب الحالي"}
+              {running
+                ? `تجميد الوقت الحالي - ${formatShortcutLabel(shortcuts.pauseTimer)}`
+                : `بدء العداد للاعب الحالي - ${formatShortcutLabel(shortcuts.startTimer)}`}
             </div>
           </button>
 
@@ -247,7 +262,9 @@ export default function Round4() {
             className="rounded-[2.2rem] border-b-[12px] border-slate-700 bg-slate-900 px-6 py-10 text-center font-black text-white shadow-xl transition-all hover:bg-slate-800 active:scale-[0.98]"
           >
             <div className="text-[clamp(2rem,4vw,3.6rem)] leading-none">تبديل اللاعب</div>
-            <div className="mt-3 text-sm font-bold text-slate-300">مسافة</div>
+            <div className="mt-3 text-sm font-bold text-slate-300">
+              {formatShortcutLabel(shortcuts.switchPlayer)}
+            </div>
           </button>
 
           <button
@@ -259,7 +276,7 @@ export default function Round4() {
           >
             <div className="text-[clamp(2rem,4vw,3.6rem)] leading-none">إعادة الضبط</div>
             <div className="mt-3 text-sm font-bold text-slate-500">
-              إعادة إلى {format(settings.time)}
+              إعادة إلى {format(settings.time)} - {formatShortcutLabel(shortcuts.resetTimer)}
             </div>
           </button>
         </section>
@@ -267,10 +284,10 @@ export default function Round4() {
         <OperatorHelpPanel
           accent="cyan"
           shortcuts={[
-            { keys: "Space", label: "تبديل اللاعب مباشرة" },
-            { keys: "S", label: "تشغيل المؤقت" },
-            { keys: "P", label: "إيقاف مؤقت" },
-            { keys: "R", label: "إعادة ضبط الوقت" },
+            { keys: formatShortcutLabel(shortcuts.switchPlayer), label: "تبديل اللاعب مباشرة" },
+            { keys: formatShortcutLabel(shortcuts.startTimer), label: "تشغيل المؤقت" },
+            { keys: formatShortcutLabel(shortcuts.pauseTimer), label: "إيقاف مؤقت" },
+            { keys: formatShortcutLabel(shortcuts.resetTimer), label: "إعادة ضبط الوقت" },
           ]}
           tips={[
             "الوقت ينقص فقط للاعب الحالي، لذلك بدّل اللاعب فور انتهاء دوره.",

@@ -21,6 +21,13 @@ const getFilledQuestionsCount = (questions = []) =>
 const defaultSettingsState = {
   roundNames: DEFAULT_ROUND_NAMES,
   questionBank: defaultQuestionBank,
+  globalShortcuts: {
+    markMistake: "m",
+    timerToggle: "space",
+    confirmAction: "enter",
+    playerOne: "1",
+    playerTwo: "2",
+  },
 
   round1: {
     time: 8,
@@ -29,6 +36,10 @@ const defaultSettingsState = {
     normalPoint: 1,
     perfectPoint: 2,
     passCount: 1,
+    shortcuts: {
+      switchPlayer: "s",
+      passTurn: "p",
+    },
   },
 
   round2: {
@@ -37,15 +48,33 @@ const defaultSettingsState = {
     namesForPoint: 10,
     normalPoint: 1,
     bonusPoint: 2,
+    shortcuts: {
+      incrementValue: "+",
+      decrementValue: "-",
+      markUnderHalf: "h",
+      backToBidding: "r",
+    },
   },
 
   round3: {
     singlePoint: 1,
     doublePoint: 2,
+    shortcuts: {
+      playerOneSingle: "1",
+      playerOneDouble: "2",
+      playerTwoSingle: "8",
+      playerTwoDouble: "9",
+    },
   },
 
   round4: {
     time: 120,
+    shortcuts: {
+      switchPlayer: "space",
+      startTimer: "s",
+      pauseTimer: "p",
+      resetTimer: "r",
+    },
   },
 };
 
@@ -112,6 +141,10 @@ export const useSettingsStore = create(
             ...currentState.roundNames,
             ...(persisted.roundNames || {}),
           },
+          globalShortcuts: {
+            ...currentState.globalShortcuts,
+            ...(persisted.globalShortcuts || {}),
+          },
           questionBank: {
             ...currentState.questionBank,
             ...(persisted.questionBank || {}),
@@ -119,6 +152,10 @@ export const useSettingsStore = create(
           round1: {
             ...currentState.round1,
             ...(persisted.round1 || {}),
+            shortcuts: {
+              ...currentState.round1.shortcuts,
+              ...((persisted.round1 || {}).shortcuts || {}),
+            },
             questionsCount: getFilledQuestionsCount(
               (persisted.questionBank || {}).round1 || currentState.questionBank.round1,
             ),
@@ -126,6 +163,10 @@ export const useSettingsStore = create(
           round2: {
             ...currentState.round2,
             ...(persisted.round2 || {}),
+            shortcuts: {
+              ...currentState.round2.shortcuts,
+              ...((persisted.round2 || {}).shortcuts || {}),
+            },
             questionsCount: getFilledQuestionsCount(
               (persisted.questionBank || {}).round2 || currentState.questionBank.round2,
             ),
@@ -133,10 +174,18 @@ export const useSettingsStore = create(
           round3: {
             ...currentState.round3,
             ...(persisted.round3 || {}),
+            shortcuts: {
+              ...currentState.round3.shortcuts,
+              ...((persisted.round3 || {}).shortcuts || {}),
+            },
           },
           round4: {
             ...currentState.round4,
             ...(persisted.round4 || {}),
+            shortcuts: {
+              ...currentState.round4.shortcuts,
+              ...((persisted.round4 || {}).shortcuts || {}),
+            },
           },
         };
       },
