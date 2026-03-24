@@ -42,7 +42,7 @@ export default function RoundTimerDisplay({
               : "bg-white/5 text-slate-400",
           ].join(" ")}
         >
-          {timeRunning ? "LIVE" : "PAUSE"}
+          {timeRunning ? "مباشر" : "إيقاف"}
         </div>
       </div>
 

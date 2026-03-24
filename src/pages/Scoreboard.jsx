@@ -162,7 +162,7 @@ export default function Scoreboard() {
                 {players[currentPlayer]?.name || ""}
               </div>
               <div className="mt-4 text-lg md:text-2xl font-black text-rose-200">
-                Speed Mode
+                وضع السرعة
               </div>
             </div>
           </div>
@@ -378,8 +378,8 @@ export default function Scoreboard() {
       {round4ActivePlayerExpired && (
         <div className="pointer-events-none absolute inset-0 z-40 flex items-center justify-center bg-slate-950/45 backdrop-blur-sm">
           <div className="w-[84%] max-w-3xl rounded-[3rem] border border-red-400/30 bg-slate-950/94 p-8 text-center shadow-[0_40px_120px_rgba(0,0,0,0.8)] md:p-12">
-            <div className="text-sm font-black uppercase tracking-[0.45em] text-red-300">
-              Time Alert
+            <div className="text-sm font-black tracking-[0.45em] text-red-300">
+              تنبيه وقت
             </div>
             <div className="mt-5 text-[clamp(2rem,4vw,4.2rem)] font-black text-white">
               انتهى وقت {players[currentPlayer]?.name || ""}

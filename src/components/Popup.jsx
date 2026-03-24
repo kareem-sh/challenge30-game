@@ -3,6 +3,7 @@ export default function Popup({ open, text }) {
 
   return (
     <div
+      dir="rtl"
       style={{
         position: "fixed",
         top: 0,

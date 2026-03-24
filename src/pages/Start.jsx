@@ -11,7 +11,7 @@ export default function Start() {
   };
 
   return (
-    <div className="min-h-screen bg-[#08090a] flex flex-col items-center justify-center p-8 relative overflow-hidden">
+    <div className="min-h-screen bg-[#08090a] flex flex-col items-center justify-center p-8 relative overflow-hidden" dir="rtl">
       {/* Abstract Background Shapes */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-purple-600/10 rounded-full blur-[120px]" />
@@ -20,8 +20,8 @@ export default function Start() {
 
       <div className="relative z-10 flex flex-col items-center max-w-4xl w-full">
         <div className="mb-4">
-          <span className="bg-white/5 border border-white/10 px-6 py-2 rounded-full text-purple-400 text-xs font-black tracking-[0.4em] uppercase">
-            Official Production Suite
+          <span className="bg-white/5 border border-white/10 px-6 py-2 rounded-full text-purple-400 text-xs font-black tracking-[0.4em]">
+            منصة التشغيل الرسمية
           </span>
         </div>
 
@@ -33,8 +33,8 @@ export default function Start() {
         </h1>
 
         <p className="text-slate-400 text-2xl font-medium mb-16 text-center max-w-2xl leading-relaxed">
-          The most advanced, high-fidelity gaming controller for your live events. 
-          Ready to broadcast?
+          منصة تشغيل وعرض متكاملة لإدارة لعبة Challenge 30 في البث المباشر.
+          هل أنت جاهز للبدء؟
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-3xl">
@@ -44,7 +44,7 @@ export default function Start() {
           >
             <div className="absolute inset-0 bg-gradient-to-r from-purple-100 to-pink-100 opacity-0 group-hover:opacity-100 transition-opacity" />
             <span className="relative flex items-center justify-center gap-4">
-               START SESSION <span className="text-4xl">→</span>
+               ابدأ الجلسة <span className="text-4xl">→</span>
             </span>
           </button>
           
@@ -54,26 +54,26 @@ export default function Start() {
           >
             <div className="absolute inset-0 bg-white/[0.02] group-hover:bg-white/[0.05] transition-colors" />
             <span className="relative flex items-center justify-center gap-4 text-slate-300">
-               TV BROADCAST <span className="opacity-50 italic">VIEW</span>
+               شاشة العرض <span className="opacity-50 italic">TV</span>
             </span>
           </button>
         </div>
 
         <div className="mt-20 flex items-center gap-12">
-          <button onClick={() => nav("/settings")} className="text-slate-500 hover:text-white font-black text-sm uppercase tracking-widest transition-colors flex items-center gap-3">
+          <button onClick={() => nav("/settings")} className="text-slate-500 hover:text-white font-black text-sm tracking-widest transition-colors flex items-center gap-3">
              <span className="w-10 h-10 rounded-full border border-slate-800 flex items-center justify-center group-hover:border-white transition-colors text-lg">⚙</span>
-             Configure Logic
+             الإعدادات
           </button>
           <div className="h-4 w-[1px] bg-slate-800" />
-          <div className="text-slate-600 font-bold text-xs uppercase tracking-widest">
-            V4.0 ENGINE
+          <div className="text-slate-600 font-bold text-xs tracking-widest">
+            الإصدار 4.0
           </div>
         </div>
       </div>
 
       {/* Footer Branding */}
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 text-slate-700 font-black text-[10px] tracking-[1em] uppercase">
-        Designed for High Performance Environments
+      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 text-slate-700 font-black text-[10px] tracking-[1em]">
+        مصمم لبيئات التشغيل عالية الأداء
       </div>
     </div>
   );

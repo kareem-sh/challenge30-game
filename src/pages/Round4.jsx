@@ -247,7 +247,7 @@ export default function Round4() {
             className="rounded-[2.2rem] border-b-[12px] border-slate-700 bg-slate-900 px-6 py-10 text-center font-black text-white shadow-xl transition-all hover:bg-slate-800 active:scale-[0.98]"
           >
             <div className="text-[clamp(2rem,4vw,3.6rem)] leading-none">تبديل اللاعب</div>
-            <div className="mt-3 text-sm font-bold text-slate-300">Space</div>
+            <div className="mt-3 text-sm font-bold text-slate-300">مسافة</div>
           </button>
 
           <button
@@ -258,7 +258,9 @@ export default function Round4() {
             className="rounded-[2.2rem] border-b-[12px] border-slate-200 bg-slate-100 px-6 py-10 text-center font-black text-slate-600 shadow-md transition-all hover:bg-slate-200 active:scale-[0.98]"
           >
             <div className="text-[clamp(2rem,4vw,3.6rem)] leading-none">إعادة الضبط</div>
-            <div className="mt-3 text-sm font-bold text-slate-500">Reset to {format(settings.time)}</div>
+            <div className="mt-3 text-sm font-bold text-slate-500">
+              إعادة إلى {format(settings.time)}
+            </div>
           </button>
         </section>
 
@@ -283,8 +285,8 @@ export default function Round4() {
         {activePlayerExpired && (
           <div className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center bg-slate-950/55 backdrop-blur-sm">
             <div className="w-[92%] max-w-2xl rounded-[2.5rem] border border-red-400/30 bg-slate-950/92 p-8 text-center shadow-[0_40px_120px_rgba(0,0,0,0.8)]">
-              <div className="text-sm font-black uppercase tracking-[0.45em] text-red-300">
-                Time Alert
+              <div className="text-sm font-black tracking-[0.45em] text-red-300">
+                تنبيه وقت
               </div>
               <div className="mt-5 text-[clamp(2rem,5vw,4rem)] font-black text-white">
                 انتهى وقت {activePlayer?.name}
