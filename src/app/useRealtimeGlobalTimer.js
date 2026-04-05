@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useGameStore } from "./gameStore";
+import { fireGlobalTimerNaturalEndIfNeeded } from "./globalTimerNaturalEnd";
 import { getCurrentGlobalTimerValue } from "./timerUtils";
 
 export default function useRealtimeGlobalTimer() {
@@ -17,25 +18,14 @@ export default function useRealtimeGlobalTimer() {
       return undefined;
     }
 
-    const intervalId = window.setInterval(() => {
+    const tick = () => {
       setNow(Date.now());
-    }, 250);
-
+      fireGlobalTimerNaturalEndIfNeeded();
+    };
+    tick();
+    const intervalId = window.setInterval(tick, 100);
     return () => window.clearInterval(intervalId);
   }, [currentRound, globalTimerStartedAt, timeRunning]);
-
-  useEffect(() => {
-    const currentValue = getCurrentGlobalTimerValue({
-      globalTimer,
-      globalTimerStartedAt,
-      timeRunning,
-      now,
-    });
-
-    if (currentRound !== 4 && timeRunning && currentValue === 0) {
-      useGameStore.getState().pauseTimer();
-    }
-  }, [currentRound, globalTimer, globalTimerStartedAt, now, timeRunning]);
 
   return getCurrentGlobalTimerValue({
     globalTimer,

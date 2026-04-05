@@ -18,6 +18,7 @@ export default function Scoreboard() {
   const auctionValue = useGameStore((s) => s.auctionValue);
   const mistakeTrigger = useGameStore((s) => s.mistakeTrigger);
   const lastMistakePlayer = useGameStore((s) => s.lastMistakePlayer);
+  const timeUpTrigger = useGameStore((s) => s.timeUpTrigger);
   const timeRunning = useGameStore((s) => s.timeRunning);
   const round2DeclaredValue = useGameStore((s) => s.round2DeclaredValue);
   const settings = useSettingsStore();
@@ -37,16 +38,21 @@ export default function Scoreboard() {
     players[currentPlayer] &&
     players[currentPlayer].time === 0;
 
-  const [playFail, { stop: stopFail }] = useSound("/sounds/fail.mp3");
+  /** Single short segment only — full fail.mp3 has a second hit that felt delayed. */
+  const MISTAKE_SPRITE_ID = "mistakeShort";
+  const [playFail, { stop: stopFail }] = useSound("/sounds/fail.mp3", {
+    volume: 0.75,
+    interrupt: true,
+    sprite: {
+      [MISTAKE_SPRITE_ID]: [0, 520],
+    },
+  });
 
   const lastMistakeTrigger = useRef(mistakeTrigger);
-  const failTimeoutRef = useRef(null);
+  const lastTimeUpTrigger = useRef(timeUpTrigger);
 
   useEffect(() => {
     return () => {
-      if (failTimeoutRef.current) {
-        window.clearTimeout(failTimeoutRef.current);
-      }
       stopFail();
     };
   }, [stopFail]);
@@ -56,13 +62,7 @@ export default function Scoreboard() {
       const affectedPlayer = players[lastMistakePlayer ?? currentPlayer];
 
       if (affectedPlayer) {
-        playFail();
-        if (failTimeoutRef.current) {
-          window.clearTimeout(failTimeoutRef.current);
-        }
-        failTimeoutRef.current = window.setTimeout(() => {
-          stopFail();
-        }, 650);
+        playFail({ id: MISTAKE_SPRITE_ID });
       }
 
       lastMistakeTrigger.current = mistakeTrigger;
@@ -74,8 +74,16 @@ export default function Scoreboard() {
     mistakeTrigger,
     playFail,
     players,
-    stopFail,
   ]);
+
+  useEffect(() => {
+    if (timeUpTrigger > lastTimeUpTrigger.current) {
+      if (currentRound === 1) {
+        playFail({ id: MISTAKE_SPRITE_ID });
+      }
+      lastTimeUpTrigger.current = timeUpTrigger;
+    }
+  }, [currentRound, playFail, timeUpTrigger]);
 
   const formatTime = (time) => {
     const minutes = Math.floor(time / 60);
@@ -132,7 +140,7 @@ export default function Scoreboard() {
         {currentRound === 1 && (
           <div className="bg-white text-black px-12 py-4 rounded-[30px] shadow-[0_0_50px_rgba(255,255,255,0.2)]">
             <div className="text-[4rem] md:text-[6rem] font-black italic tabular-nums leading-none">
-              <Timer onFinish={() => {}} />
+              <Timer />
             </div>
           </div>
         )}
@@ -147,7 +155,7 @@ export default function Scoreboard() {
                 {round2DeclaredValue}
               </div>
               <div className="mt-4 text-2xl md:text-4xl font-black italic tabular-nums text-yellow-200">
-                <Timer onFinish={() => {}} />
+                <Timer />
               </div>
             </div>
           </div>

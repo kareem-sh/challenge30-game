@@ -1,6 +1,12 @@
 import { RouterProvider } from "react-router-dom";
+import GlobalTimerDeadlineScheduler from "./components/GlobalTimerDeadlineScheduler";
 import { router } from "./router";
 
 export default function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <>
+      <GlobalTimerDeadlineScheduler />
+      <RouterProvider router={router} />
+    </>
+  );
 }

@@ -2,7 +2,11 @@ import { useEffect } from "react";
 import { useGameStore } from "../app/gameStore";
 import { useSettingsStore } from "../app/settingsStore";
 import { getRoundName } from "../app/roundUtils";
-import { eventMatchesShortcut, formatShortcutLabel } from "../app/shortcutUtils";
+import {
+  eventMatchesShortcut,
+  formatShortcutLabel,
+  shouldIgnoreShortcutEvent,
+} from "../app/shortcutUtils";
 import OperatorHelpPanel from "../components/OperatorHelpPanel";
 
 export default function Round4() {
@@ -21,7 +25,9 @@ export default function Round4() {
   const settings = useSettingsStore((s) => s.round4);
   const allSettings = useSettingsStore();
   const shortcuts = settings.shortcuts;
-  const scoresAlreadyReset = players.every((player) => Number(player.score || 0) === 0);
+  const scoresAlreadyReset = players.every(
+    (player) => Number(player.score || 0) === 0,
+  );
 
   useEffect(() => {
     const intervalId = window.setInterval(() => {

@@ -26,6 +26,8 @@ export const useGameStore = create(
       auctionPlayerIndex: null,
       mistakeTrigger: 0,
       lastMistakePlayer: null,
+      timeUpTrigger: 0,
+      globalTimerNaturalEndToken: 0,
       biddingValue: 0,
       round2Phase: "bidding",
       round2DeclaredValue: 0,
@@ -62,6 +64,14 @@ export const useGameStore = create(
           mistakeTrigger: get().mistakeTrigger + 1,
           lastMistakePlayer: player,
         }),
+
+      triggerTimeUpSound: () =>
+        set({ timeUpTrigger: get().timeUpTrigger + 1 }),
+
+      bumpGlobalTimerNaturalEnd: () =>
+        set((state) => ({
+          globalTimerNaturalEndToken: state.globalTimerNaturalEndToken + 1,
+        })),
 
       setAuction: (val, playerIndex = get().currentPlayer) =>
         set({

@@ -4,7 +4,6 @@ import useRealtimeGlobalTimer from "../app/useRealtimeGlobalTimer";
 
 export default function RoundTimerDisplay({
   totalSeconds,
-  onFinish,
   compact = false,
   label = "الوقت المتبقي",
 }) {
@@ -49,7 +48,6 @@ export default function RoundTimerDisplay({
       <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
         <div className="text-right">
           <Timer
-            onFinish={onFinish}
             warningThreshold={Math.max(Math.ceil(clampedTotal * 0.35), 3)}
             className={[
               "block tabular-nums font-black tracking-[-0.05em] leading-none",

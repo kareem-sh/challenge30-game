@@ -36,7 +36,9 @@ export default function Round2() {
   const setRound2Phase = useGameStore((s) => s.setRound2Phase);
   const setRound2DeclaredValue = useGameStore((s) => s.setRound2DeclaredValue);
   const setRound2CorrectCount = useGameStore((s) => s.setRound2CorrectCount);
-  const setRound2PlayerDeclaration = useGameStore((s) => s.setRound2PlayerDeclaration);
+  const setRound2PlayerDeclaration = useGameStore(
+    (s) => s.setRound2PlayerDeclaration,
+  );
   const setRound2LastOutcome = useGameStore((s) => s.setRound2LastOutcome);
   const settings = useSettingsStore((s) => s.round2);
   const allSettings = useSettingsStore();
@@ -47,15 +49,22 @@ export default function Round2() {
   const roundTitle = getRoundName(allSettings, 2);
   const shortcuts = settings.shortcuts;
   const globalShortcuts = allSettings.globalShortcuts;
-  const challengePoints = Math.floor(round2DeclaredValue / settings.namesForPoint);
-  const successReady = round2DeclaredValue > 0 && round2CorrectCount >= round2DeclaredValue;
+  const challengePoints = Math.floor(
+    round2DeclaredValue / settings.namesForPoint,
+  );
+  const successReady =
+    round2DeclaredValue > 0 && round2CorrectCount >= round2DeclaredValue;
   const underHalfReached =
     round2DeclaredValue > 0 && round2CorrectCount < round2DeclaredValue / 2;
   const round2QuestionBank = (allSettings.questionBank?.round2 || []).filter(
     (bankQuestion) => bankQuestion.trim().length > 0,
   );
-  const selectedBankQuestion = round2QuestionBank.includes(question) ? question : "";
-  const scoresAlreadyReset = players.every((player) => Number(player.score || 0) === 0);
+  const selectedBankQuestion = round2QuestionBank.includes(question)
+    ? question
+    : "";
+  const scoresAlreadyReset = players.every(
+    (player) => Number(player.score || 0) === 0,
+  );
 
   const handleTimerToggle = () => {
     if (timeRunning) {
@@ -84,6 +93,13 @@ export default function Round2() {
   const handleResetTimer = () => {
     pauseTimer();
     resetGlobalTimer(settings.time);
+  };
+
+  const handleManualScoreChange = (playerIndex, delta) => {
+    if (delta === 0) return;
+    const score = Number(players[playerIndex]?.score || 0);
+    if (delta < 0 && score <= 0) return;
+    addScore(playerIndex, delta);
   };
 
   const startChallenge = (playerIndex) => {
@@ -119,7 +135,8 @@ export default function Round2() {
   const handleFailure = (type) => {
     pauseTimer();
 
-    const points = type === "underHalf" ? settings.bonusPoint : settings.normalPoint;
+    const points =
+      type === "underHalf" ? settings.bonusPoint : settings.normalPoint;
     addScore(other, points);
     triggerMistakeSound(current);
 
@@ -214,13 +231,19 @@ export default function Round2() {
       return;
     }
 
-    if (!isBiddingPhase && eventMatchesShortcut(event, globalShortcuts.markMistake)) {
+    if (
+      !isBiddingPhase &&
+      eventMatchesShortcut(event, globalShortcuts.markMistake)
+    ) {
       event.preventDefault();
       handleFailure("mistake");
       return;
     }
 
-    if (!isBiddingPhase && eventMatchesShortcut(event, shortcuts.markUnderHalf)) {
+    if (
+      !isBiddingPhase &&
+      eventMatchesShortcut(event, shortcuts.markUnderHalf)
+    ) {
       event.preventDefault();
       handleFailure("underHalf");
       return;
@@ -259,7 +282,9 @@ export default function Round2() {
                   الجولة 2
                 </span>
                 <span className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-bold text-slate-300">
-                  {isBiddingPhase ? "مرحلة إعلان العدد" : `التحدي الآن: ${players[current].name}`}
+                  {isBiddingPhase
+                    ? "مرحلة إعلان العدد"
+                    : `التحدي الآن: ${players[current].name}`}
                 </span>
               </div>
               <div>
@@ -278,7 +303,9 @@ export default function Round2() {
                 <div className="text-[0.65rem] font-black uppercase tracking-[0.3em] text-slate-500">
                   زمن التحدي
                 </div>
-                <div className="mt-3 text-3xl font-black text-white">{settings.time} ث</div>
+                <div className="mt-3 text-3xl font-black text-white">
+                  {settings.time} ث
+                </div>
               </div>
               <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
                 <div className="text-[0.65rem] font-black uppercase tracking-[0.3em] text-slate-500">
@@ -324,7 +351,10 @@ export default function Round2() {
                   >
                     <option value="">اختر سؤالاً محفوظاً أو اكتب يدوياً</option>
                     {round2QuestionBank.map((bankQuestion, index) => (
-                      <option key={`${bankQuestion}-${index}`} value={bankQuestion}>
+                      <option
+                        key={`${bankQuestion}-${index}`}
+                        value={bankQuestion}
+                      >
                         {index + 1}. {bankQuestion}
                       </option>
                     ))}
@@ -355,8 +385,8 @@ export default function Round2() {
                       مرحلة إعلان العدد
                     </div>
                     <div className="mt-2 text-sm text-slate-500">
-                      ثبّت العدد أولاً ثم اختر اللاعب الذي سيلتزم به ليظهر الـ popup
-                      مباشرة للجمهور.
+                      ثبّت العدد أولاً ثم اختر اللاعب الذي سيلتزم به ليظهر الـ
+                      popup مباشرة للجمهور.
                     </div>
                   </div>
 
@@ -372,7 +402,9 @@ export default function Round2() {
 
                 <div className="mb-10 flex items-center justify-center gap-5">
                   <button
-                    onClick={() => setRound2DeclaredValue(round2DeclaredValue - 1)}
+                    onClick={() =>
+                      setRound2DeclaredValue(round2DeclaredValue - 1)
+                    }
                     className="h-20 w-20 rounded-full border border-white/10 bg-white/5 text-4xl font-black text-white transition hover:bg-white/10"
                   >
                     -
@@ -386,7 +418,9 @@ export default function Round2() {
                     </div>
                   </div>
                   <button
-                    onClick={() => setRound2DeclaredValue(round2DeclaredValue + 1)}
+                    onClick={() =>
+                      setRound2DeclaredValue(round2DeclaredValue + 1)
+                    }
                     className="h-20 w-20 rounded-full border border-white/10 bg-white/5 text-4xl font-black text-white transition hover:bg-white/10"
                   >
                     +
@@ -483,7 +517,9 @@ export default function Round2() {
                   </div>
                   <div className="mb-6 flex items-center justify-center gap-6">
                     <button
-                      onClick={() => setRound2CorrectCount(round2CorrectCount - 1)}
+                      onClick={() =>
+                        setRound2CorrectCount(round2CorrectCount - 1)
+                      }
                       className="h-20 w-20 rounded-full border border-white/10 bg-white/5 text-4xl font-black text-white transition hover:bg-white/10"
                     >
                       -
@@ -494,7 +530,9 @@ export default function Round2() {
                       </div>
                     </div>
                     <button
-                      onClick={() => setRound2CorrectCount(round2CorrectCount + 1)}
+                      onClick={() =>
+                        setRound2CorrectCount(round2CorrectCount + 1)
+                      }
                       className="h-20 w-20 rounded-full border border-white/10 bg-white/5 text-4xl font-black text-white transition hover:bg-white/10"
                     >
                       +
@@ -502,7 +540,9 @@ export default function Round2() {
                   </div>
 
                   <div className="mb-6 rounded-[1.4rem] border border-white/10 bg-white/5 px-5 py-4 text-right">
-                    <div className="text-sm font-bold text-slate-400">مؤشر الحسم</div>
+                    <div className="text-sm font-bold text-slate-400">
+                      مؤشر الحسم
+                    </div>
                     <div className="mt-2 text-lg font-black text-white">
                       {successReady
                         ? "العدد المحقق يطابق العدد المعلن ويمكن اعتماد النجاح"
@@ -520,7 +560,7 @@ export default function Round2() {
                     >
                       نجح بالتحدي
                       <div className="mt-2 text-sm font-semibold text-white/80">
-                      {challengePoints > 0
+                        {challengePoints > 0
                           ? `${challengePoints} نقطة`
                           : "لا توجد نقاط إذا كان العدد أقل من 10"}
                       </div>
@@ -562,7 +602,6 @@ export default function Round2() {
             <RoundTimerDisplay
               totalSeconds={settings.time}
               label={isBiddingPhase ? "مؤقت إعلان العدد" : "مؤقت التحدي"}
-              onFinish={pauseTimer}
             />
 
             <section className="rounded-[2rem] border border-white/10 bg-slate-950/75 p-5 shadow-[0_24px_70px_rgba(15,23,42,0.35)] backdrop-blur-xl md:p-7">
@@ -657,6 +696,25 @@ export default function Round2() {
                         <div className="mt-2 text-3xl font-black text-white tabular-nums">
                           {player.score}
                         </div>
+                        <div className="mt-3 flex flex-row-reverse items-center justify-end gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleManualScoreChange(index, 1)}
+                            className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1.5 text-xs font-black text-emerald-100 transition hover:bg-emerald-400/15"
+                            aria-label={`نقطة إضافية لـ ${player.name}`}
+                          >
+                            +1
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleManualScoreChange(index, -1)}
+                            disabled={Number(player.score || 0) <= 0}
+                            className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-black text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+                            aria-label={`نقطة أقل لـ ${player.name}`}
+                          >
+                            -1
+                          </button>
+                        </div>
                       </div>
                     </div>
 
@@ -684,19 +742,24 @@ export default function Round2() {
 
               <div className="grid gap-4 text-right">
                 <div className="rounded-[1.4rem] border border-white/10 bg-white/5 p-4">
-                  <div className="text-sm font-bold text-slate-400">الوضع الحالي</div>
+                  <div className="text-sm font-bold text-slate-400">
+                    الوضع الحالي
+                  </div>
                   <div className="mt-2 text-xl font-black text-white">
-                    {isBiddingPhase ? "بانتظار تثبيت المزاد" : `التحدي مع ${players[current].name}`}
+                    {isBiddingPhase
+                      ? "بانتظار تثبيت المزاد"
+                      : `التحدي مع ${players[current].name}`}
                   </div>
                 </div>
                 <div className="rounded-[1.4rem] border border-white/10 bg-white/5 p-4">
-                  <div className="text-sm font-bold text-slate-400">آخر نتيجة</div>
+                  <div className="text-sm font-bold text-slate-400">
+                    آخر نتيجة
+                  </div>
                   <div className="mt-2 text-base font-bold text-white">
                     {lastOutcomeLabel}
                   </div>
                 </div>
               </div>
-
             </section>
           </aside>
         </div>
@@ -712,8 +775,14 @@ export default function Round2() {
               keys: `${formatShortcutLabel(globalShortcuts.playerOne)} / ${formatShortcutLabel(globalShortcuts.playerTwo)}`,
               label: "تحديد اللاعب أو بدء التحدي له",
             },
-            { keys: formatShortcutLabel(globalShortcuts.timerToggle), label: "تشغيل أو إيقاف المؤقت" },
-            { keys: formatShortcutLabel(globalShortcuts.confirmAction), label: "بدء التحدي أو اعتماد النجاح" },
+            {
+              keys: formatShortcutLabel(globalShortcuts.timerToggle),
+              label: "تشغيل أو إيقاف المؤقت",
+            },
+            {
+              keys: formatShortcutLabel(globalShortcuts.confirmAction),
+              label: "بدء التحدي أو اعتماد النجاح",
+            },
             {
               keys: `${formatShortcutLabel(globalShortcuts.markMistake)} / ${formatShortcutLabel(shortcuts.markUnderHalf)} / ${formatShortcutLabel(shortcuts.backToBidding)}`,
               label: "خطأ / أقل من النصف / عودة للمزايدة",
