@@ -2,7 +2,10 @@ import { useEffect } from "react";
 import { useGameStore } from "../app/gameStore";
 import { useSettingsStore } from "../app/settingsStore";
 import { getRoundName } from "../app/roundUtils";
-import { eventMatchesShortcut, formatShortcutLabel } from "../app/shortcutUtils";
+import {
+  eventMatchesShortcut,
+  formatShortcutLabel,
+} from "../app/shortcutUtils";
 import OperatorHelpPanel from "../components/OperatorHelpPanel";
 
 export default function Round4() {
@@ -13,6 +16,7 @@ export default function Round4() {
   const pauseTimer = useGameStore((s) => s.pauseTimer);
   const tick = useGameStore((s) => s.tick);
   const resetTimes = useGameStore((s) => s.resetTimes);
+  const addScore = useGameStore((s) => s.addScore);
   const nextRound = useGameStore((s) => s.nextRound);
   const prevRound = useGameStore((s) => s.prevRound);
   const running = useGameStore((s) => s.timeRunning);
@@ -104,8 +108,9 @@ export default function Round4() {
                   {roundTitle}
                 </h1>
                 <p className="mt-3 max-w-3xl text-base leading-7 text-slate-300 md:text-lg">
-                  نفس الواجهة الأساسية، لكن مع توضيح أقوى للاعب الحالي، تقدّم الوقت،
-                  وتنبيهات انتهاء أوضح حتى تكون إدارة الجولة أسرع وأقل عرضة للخطأ.
+                  نفس الواجهة الأساسية، لكن مع توضيح أقوى للاعب الحالي، تقدّم
+                  الوقت، وتنبيهات انتهاء أوضح حتى تكون إدارة الجولة أسرع وأقل
+                  عرضة للخطأ.
                 </p>
               </div>
             </div>
@@ -140,7 +145,11 @@ export default function Round4() {
                         : "text-amber-300"
                   }`}
                 >
-                  {activePlayerExpired ? "انتهى الوقت" : running ? "يعمل الآن" : "متوقف"}
+                  {activePlayerExpired
+                    ? "انتهى الوقت"
+                    : running
+                      ? "يعمل الآن"
+                      : "متوقف"}
                 </div>
               </div>
             </div>
@@ -197,7 +206,9 @@ export default function Round4() {
                     {player.name}
                   </div>
                   <div className="mt-4 text-sm font-bold text-slate-500">
-                    {isExpired ? "انتهى الوقت لهذا اللاعب" : `النقاط: ${player.score}`}
+                    {isExpired
+                      ? "انتهى الوقت لهذا اللاعب"
+                      : `النقاط: ${player.score}`}
                   </div>
                 </div>
 
@@ -230,8 +241,29 @@ export default function Round4() {
                           : "bg-white/5 text-slate-400"
                     }`}
                   >
-                    {isExpired ? "توقف تلقائياً" : isActive ? "الوقت ينقص الآن" : "بانتظار الدور"}
+                    {isExpired
+                      ? "توقف تلقائياً"
+                      : isActive
+                        ? "الوقت ينقص الآن"
+                        : "بانتظار الدور"}
                   </div>
+                </div>
+
+                <div className="mt-8 grid gap-3 sm:grid-cols-2">
+                  <button
+                    type="button"
+                    onClick={() => addScore(index, 1)}
+                    className="rounded-[2rem] border border-cyan-400/20 bg-cyan-500/10 px-5 py-4 text-sm font-black uppercase tracking-[0.12em] text-cyan-100 transition hover:bg-cyan-500/20"
+                  >
+                    +1 نقطة
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => addScore(index, -1)}
+                    className="rounded-[2rem] border border-red-400/20 bg-red-500/10 px-5 py-4 text-sm font-black uppercase tracking-[0.12em] text-red-100 transition hover:bg-red-500/20"
+                  >
+                    -1 نقطة
+                  </button>
                 </div>
               </section>
             );
@@ -261,7 +293,9 @@ export default function Round4() {
             onClick={switchPlayer}
             className="rounded-[2.2rem] border-b-[12px] border-slate-700 bg-slate-900 px-6 py-10 text-center font-black text-white shadow-xl transition-all hover:bg-slate-800 active:scale-[0.98]"
           >
-            <div className="text-[clamp(2rem,4vw,3.6rem)] leading-none">تبديل اللاعب</div>
+            <div className="text-[clamp(2rem,4vw,3.6rem)] leading-none">
+              تبديل اللاعب
+            </div>
             <div className="mt-3 text-sm font-bold text-slate-300">
               {formatShortcutLabel(shortcuts.switchPlayer)}
             </div>
@@ -274,9 +308,12 @@ export default function Round4() {
             }}
             className="rounded-[2.2rem] border-b-[12px] border-slate-200 bg-slate-100 px-6 py-10 text-center font-black text-slate-600 shadow-md transition-all hover:bg-slate-200 active:scale-[0.98]"
           >
-            <div className="text-[clamp(2rem,4vw,3.6rem)] leading-none">إعادة الضبط</div>
+            <div className="text-[clamp(2rem,4vw,3.6rem)] leading-none">
+              إعادة الضبط
+            </div>
             <div className="mt-3 text-sm font-bold text-slate-500">
-              إعادة إلى {format(settings.time)} - {formatShortcutLabel(shortcuts.resetTimer)}
+              إعادة إلى {format(settings.time)} -{" "}
+              {formatShortcutLabel(shortcuts.resetTimer)}
             </div>
           </button>
         </section>
@@ -284,10 +321,22 @@ export default function Round4() {
         <OperatorHelpPanel
           accent="cyan"
           shortcuts={[
-            { keys: formatShortcutLabel(shortcuts.switchPlayer), label: "تبديل اللاعب مباشرة" },
-            { keys: formatShortcutLabel(shortcuts.startTimer), label: "تشغيل المؤقت" },
-            { keys: formatShortcutLabel(shortcuts.pauseTimer), label: "إيقاف مؤقت" },
-            { keys: formatShortcutLabel(shortcuts.resetTimer), label: "إعادة ضبط الوقت" },
+            {
+              keys: formatShortcutLabel(shortcuts.switchPlayer),
+              label: "تبديل اللاعب مباشرة",
+            },
+            {
+              keys: formatShortcutLabel(shortcuts.startTimer),
+              label: "تشغيل المؤقت",
+            },
+            {
+              keys: formatShortcutLabel(shortcuts.pauseTimer),
+              label: "إيقاف مؤقت",
+            },
+            {
+              keys: formatShortcutLabel(shortcuts.resetTimer),
+              label: "إعادة ضبط الوقت",
+            },
           ]}
           tips={[
             "الوقت ينقص فقط للاعب الحالي، لذلك بدّل اللاعب فور انتهاء دوره.",

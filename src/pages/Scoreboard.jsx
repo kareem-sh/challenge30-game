@@ -33,12 +33,11 @@ export default function Scoreboard() {
   );
   const round4BaseTime = Math.max(settings.round4.time, 1);
   const round4ActivePlayerExpired =
-    currentRound === 4 && players[currentPlayer] && players[currentPlayer].time === 0;
+    currentRound === 4 &&
+    players[currentPlayer] &&
+    players[currentPlayer].time === 0;
 
-  const [playMistake] = useSound("/sounds/mistake.mp3");
-  const [playFail, { stop: stopFail }] = useSound(
-    "/sounds/fail.mp3",
-  );
+  const [playFail, { stop: stopFail }] = useSound("/sounds/fail.mp3");
 
   const lastMistakeTrigger = useRef(mistakeTrigger);
   const failTimeoutRef = useRef(null);
@@ -56,7 +55,7 @@ export default function Scoreboard() {
     if (mistakeTrigger > lastMistakeTrigger.current) {
       const affectedPlayer = players[lastMistakePlayer ?? currentPlayer];
 
-      if (affectedPlayer?.strikes >= mistakeLimit) {
+      if (affectedPlayer) {
         playFail();
         if (failTimeoutRef.current) {
           window.clearTimeout(failTimeoutRef.current);
@@ -64,8 +63,6 @@ export default function Scoreboard() {
         failTimeoutRef.current = window.setTimeout(() => {
           stopFail();
         }, 650);
-      } else {
-        playMistake();
       }
 
       lastMistakeTrigger.current = mistakeTrigger;
@@ -88,7 +85,10 @@ export default function Scoreboard() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white font-sans overflow-hidden flex flex-col p-6 md:p-10 relative" dir="rtl">
+    <div
+      className="min-h-screen bg-[#050505] text-white font-sans overflow-hidden flex flex-col p-6 md:p-10 relative"
+      dir="rtl"
+    >
       <div className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-purple-600/20 rounded-full blur-[150px] animate-pulse pointer-events-none" />
       <div className="absolute bottom-[-20%] left-[-10%] w-[600px] h-[600px] bg-pink-600/20 rounded-full blur-[150px] animate-pulse pointer-events-none" />
 
@@ -102,7 +102,9 @@ export default function Scoreboard() {
         <div className="absolute top-0 right-0 h-1 w-full bg-white/5 overflow-hidden">
           <div
             className="ml-auto h-full bg-gradient-to-l from-purple-500 to-pink-500 transition-[width] duration-300"
-            style={{ width: `${timeRunning ? round1Progress : round1Progress}%` }}
+            style={{
+              width: `${timeRunning ? round1Progress : round1Progress}%`,
+            }}
           />
         </div>
         <div className="flex flex-col items-start">
@@ -189,7 +191,9 @@ export default function Scoreboard() {
         )}
 
         {currentRound !== 1 && (
-          <div className={`bg-white/5 backdrop-blur-3xl border border-white/10 px-6 md:px-12 py-3 md:py-6 rounded-[20px] md:rounded-[30px] ${currentRound === 2 || currentRound === 3 || currentRound === 4 ? "hidden" : ""}`}>
+          <div
+            className={`bg-white/5 backdrop-blur-3xl border border-white/10 px-6 md:px-12 py-3 md:py-6 rounded-[20px] md:rounded-[30px] ${currentRound === 2 || currentRound === 3 || currentRound === 4 ? "hidden" : ""}`}
+          >
             <span className="text-xl md:text-4xl font-black tracking-widest text-white italic uppercase">
               الجولة {currentRound}
             </span>
@@ -250,7 +254,9 @@ export default function Scoreboard() {
               {currentRound === 4 ? (
                 <div
                   className={`text-[6rem] md:text-[9rem] leading-none font-black font-mono tracking-tighter ${
-                    player.time < 30 ? "text-red-500 animate-pulse" : "text-slate-300"
+                    player.time < 30
+                      ? "text-red-500 animate-pulse"
+                      : "text-slate-300"
                   }`}
                 >
                   {formatTime(player.time)}
@@ -267,7 +273,9 @@ export default function Scoreboard() {
               ) : currentRound === 3 ? (
                 <div className="flex flex-col items-center gap-4">
                   <div className="text-slate-500 text-[10px] md:text-sm font-black tracking-[0.5em] opacity-50 uppercase">
-                    {currentPlayer === index ? "اللاعب الحالي" : "بانتظار النقاط"}
+                    {currentPlayer === index
+                      ? "اللاعب الحالي"
+                      : "بانتظار النقاط"}
                   </div>
                   <div
                     className={`rounded-full border px-8 py-3 text-lg md:text-2xl font-black ${
@@ -334,7 +342,9 @@ export default function Scoreboard() {
 
       <div
         className={`transition-all duration-700 mt-10 md:mt-16 h-24 md:h-36 bg-white/[0.03] backdrop-blur-3xl border-t border-white/5 rounded-[20px] md:rounded-[40px] flex items-center px-10 md:px-16 relative overflow-hidden ${
-          currentRound === 1 ? "opacity-0 translate-y-20 absolute" : "opacity-100 translate-y-0"
+          currentRound === 1
+            ? "opacity-0 translate-y-20 absolute"
+            : "opacity-100 translate-y-0"
         }`}
       >
         <div className="absolute top-0 right-0 h-1 w-full bg-white/5 overflow-hidden">
@@ -370,7 +380,7 @@ export default function Scoreboard() {
                 ? round4ActivePlayerExpired
                   ? `انتهى وقت ${players[currentPlayer]?.name || ""}`
                   : `الوقت يعمل الآن لـ ${players[currentPlayer]?.name || ""}`
-              : question || "بانتظار التحدي القادم..."}
+                : question || "بانتظار التحدي القادم..."}
           </span>
         </div>
       </div>

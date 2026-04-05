@@ -1,8 +1,11 @@
-import { useEffect, useEffectEvent } from "react";
+import { useEffect, useEffectEvent, useState } from "react";
 import { useGameStore } from "../app/gameStore";
 import { useSettingsStore } from "../app/settingsStore";
 import { getRoundName } from "../app/roundUtils";
-import { eventMatchesShortcut, formatShortcutLabel } from "../app/shortcutUtils";
+import {
+  eventMatchesShortcut,
+  formatShortcutLabel,
+} from "../app/shortcutUtils";
 import RoundTimerDisplay from "../components/RoundTimerDisplay";
 import StrikeMeter from "../components/StrikeMeter";
 import PassMeter from "../components/PassMeter";
@@ -39,33 +42,40 @@ export default function Round1() {
 
   const other = current === 0 ? 1 : 0;
   const isQuestionReady = question.trim().length > 0;
-  const questionResolved = players.some((player) => player.strikes >= settings.mistakes);
+  const questionResolved = players.some(
+    (player) => player.strikes >= settings.mistakes,
+  );
   const resolvedPlayerIndex = players.findIndex(
     (player) => player.strikes >= settings.mistakes,
   );
-  const winnerIndex = resolvedPlayerIndex === -1 ? -1 : resolvedPlayerIndex === 0 ? 1 : 0;
+  const winnerIndex =
+    resolvedPlayerIndex === -1 ? -1 : resolvedPlayerIndex === 0 ? 1 : 0;
   const passLimit = Math.max(1, Number(settings.passCount) || 1);
   const roundTitle = getRoundName(allSettings, 1);
   const shortcuts = settings.shortcuts;
   const globalShortcuts = allSettings.globalShortcuts;
   const currentPlayerPassUsed = Number(round1PassUsed[current] || 0);
   const currentPlayerHasPass = currentPlayerPassUsed < passLimit;
+  const [timeExpired, setTimeExpired] = useState(false);
   const round1QuestionBank = (allSettings.questionBank?.round1 || []).filter(
     (bankQuestion) => bankQuestion.trim().length > 0,
   );
-  const selectedBankQuestion = round1QuestionBank.includes(question) ? question : "";
+  const selectedBankQuestion = round1QuestionBank.includes(question)
+    ? question
+    : "";
 
   const prepareTimer = () => {
     resetGlobalTimer(settings.time);
   };
 
   const handleStartOrResume = () => {
-    if (!isQuestionReady || questionResolved) return;
+    if (!isQuestionReady || questionResolved || timeExpired) return;
 
     if (globalTimer <= 0 || globalTimer > settings.time) {
       prepareTimer();
     }
 
+    setTimeExpired(false);
     startTimer();
   };
 
@@ -79,7 +89,7 @@ export default function Round1() {
   };
 
   const handleSwitch = () => {
-    if (!isQuestionReady || questionResolved) return;
+    if (!isQuestionReady || questionResolved || timeExpired) return;
 
     switchPlayer();
     restartGlobalTimer(settings.time);
@@ -88,6 +98,7 @@ export default function Round1() {
   const handleStrike = () => {
     if (!isQuestionReady || questionResolved) return;
 
+    setTimeExpired(false);
     addStrike(current);
     triggerMistakeSound(current);
 
@@ -102,7 +113,7 @@ export default function Round1() {
 
       addScore(other, points);
       setCurrentPlayer(other);
-      resetGlobalTimer(settings.time);
+      restartGlobalTimer(settings.time);
       return;
     }
 
@@ -111,7 +122,13 @@ export default function Round1() {
   };
 
   const handlePassTurn = () => {
-    if (!isQuestionReady || questionResolved || !currentPlayerHasPass) return;
+    if (
+      !isQuestionReady ||
+      questionResolved ||
+      timeExpired ||
+      !currentPlayerHasPass
+    )
+      return;
 
     markRound1PassUsed(current);
     switchPlayer();
@@ -120,6 +137,7 @@ export default function Round1() {
 
   const finishCurrentQuestion = () => {
     pauseTimer();
+    setTimeExpired(false);
     resetQuestion(settings.time);
 
     if (round1QuestionIndex < settings.questionsCount) {
@@ -132,6 +150,12 @@ export default function Round1() {
       setGlobalTimer(settings.time);
     }
   }, [globalTimer, setGlobalTimer, settings.time]);
+
+  useEffect(() => {
+    if (!isQuestionReady || questionResolved) {
+      setTimeExpired(false);
+    }
+  }, [isQuestionReady, questionResolved]);
 
   const onGlobalKeydown = useEffectEvent((event) => {
     const tagName = event.target?.tagName;
@@ -184,11 +208,13 @@ export default function Round1() {
 
   const statusMessage = questionResolved
     ? `تم حسم السؤال لصالح ${players[winnerIndex]?.name || ""}`
-    : timeRunning
-      ? `الدور الآن على ${players[current].name}`
-      : isQuestionReady
-        ? "السؤال جاهز ويمكنك بدء العدّاد"
-        : "أدخل موضوع السؤال أولاً";
+    : timeExpired
+      ? `انتهى وقت ${players[current].name}. اضغط خطأ لبدء الوقت تلقائياً للاعب الآخر.`
+      : timeRunning
+        ? `الدور الآن على ${players[current].name}`
+        : isQuestionReady
+          ? "السؤال جاهز ويمكنك بدء العدّاد"
+          : "أدخل موضوع السؤال أولاً";
 
   return (
     <div
@@ -229,13 +255,17 @@ export default function Round1() {
                 <div className="text-[0.65rem] font-black uppercase tracking-[0.3em] text-slate-500">
                   زمن المحاولة
                 </div>
-                <div className="mt-3 text-3xl font-black text-white">{settings.time} ث</div>
+                <div className="mt-3 text-3xl font-black text-white">
+                  {settings.time} ث
+                </div>
               </div>
               <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
                 <div className="text-[0.65rem] font-black uppercase tracking-[0.3em] text-slate-500">
                   حد الأخطاء
                 </div>
-                <div className="mt-3 text-3xl font-black text-white">{settings.mistakes}</div>
+                <div className="mt-3 text-3xl font-black text-white">
+                  {settings.mistakes}
+                </div>
               </div>
               <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
                 <div className="text-[0.65rem] font-black uppercase tracking-[0.3em] text-slate-500">
@@ -249,8 +279,12 @@ export default function Round1() {
                 <div className="text-[0.65rem] font-black uppercase tracking-[0.3em] text-slate-500">
                   عدد التمريرات
                 </div>
-                <div className="mt-3 text-3xl font-black text-white">{settings.passCount}</div>
-                <div className="mt-1 text-xs font-bold text-slate-400">لكل لاعب في السؤال</div>
+                <div className="mt-3 text-3xl font-black text-white">
+                  {settings.passCount}
+                </div>
+                <div className="mt-1 text-xs font-bold text-slate-400">
+                  لكل لاعب في السؤال
+                </div>
               </div>
             </div>
           </div>
@@ -265,8 +299,8 @@ export default function Round1() {
                     موضوع السؤال الحالي
                   </div>
                   <div className="mt-2 text-sm text-slate-500">
-                    اختر السؤال من بنك الأسئلة أو اكتب عنوان التحدي يدوياً ليظهر فوراً
-                    على شاشة الجمهور.
+                    اختر السؤال من بنك الأسئلة أو اكتب عنوان التحدي يدوياً ليظهر
+                    فوراً على شاشة الجمهور.
                   </div>
                 </div>
                 <div
@@ -295,7 +329,10 @@ export default function Round1() {
                   >
                     <option value="">اختر سؤالاً محفوظاً أو اكتب يدوياً</option>
                     {round1QuestionBank.map((bankQuestion, index) => (
-                      <option key={`${bankQuestion}-${index}`} value={bankQuestion}>
+                      <option
+                        key={`${bankQuestion}-${index}`}
+                        value={bankQuestion}
+                      >
                         {index + 1}. {bankQuestion}
                       </option>
                     ))}
@@ -413,7 +450,12 @@ export default function Round1() {
           <aside className="space-y-6">
             <RoundTimerDisplay
               totalSeconds={settings.time}
-              onFinish={handleStrike}
+              onFinish={() => {
+                if (!questionResolved && isQuestionReady) {
+                  pauseTimer();
+                  setTimeExpired(true);
+                }
+              }}
               label="مؤقت الدور الحالي"
             />
 
@@ -442,7 +484,9 @@ export default function Round1() {
                 <div className="grid gap-4 md:grid-cols-2">
                   <button
                     onClick={handleSwitch}
-                    disabled={!isQuestionReady || questionResolved}
+                    disabled={
+                      !isQuestionReady || questionResolved || timeExpired
+                    }
                     className="rounded-[1.5rem] border border-cyan-400/20 bg-cyan-400/10 px-5 py-5 text-right text-lg font-black text-cyan-100 transition hover:bg-cyan-400/15 disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     تبديل إلى {players[other].name}
@@ -453,7 +497,12 @@ export default function Round1() {
 
                   <button
                     onClick={handlePassTurn}
-                    disabled={!isQuestionReady || questionResolved || !currentPlayerHasPass}
+                    disabled={
+                      !isQuestionReady ||
+                      questionResolved ||
+                      timeExpired ||
+                      !currentPlayerHasPass
+                    }
                     className="rounded-[1.5rem] border border-violet-300/20 bg-violet-400/10 px-5 py-5 text-right text-lg font-black text-violet-100 transition hover:bg-violet-400/15 disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     تمرير الدور إلى {players[other].name}
@@ -480,7 +529,8 @@ export default function Round1() {
                   onClick={finishCurrentQuestion}
                   className="rounded-[1.5rem] border border-emerald-300/20 bg-emerald-400/10 px-5 py-5 text-right text-lg font-black text-emerald-100 transition hover:bg-emerald-400/15"
                 >
-                  إنهاء السؤال الحالي والانتقال لرقم {Math.min(round1QuestionIndex + 1, settings.questionsCount)}
+                  إنهاء السؤال الحالي والانتقال لرقم{" "}
+                  {Math.min(round1QuestionIndex + 1, settings.questionsCount)}
                   <div className="mt-2 text-xs font-semibold text-emerald-100/80">
                     {formatShortcutLabel(globalShortcuts.confirmAction)}
                   </div>
@@ -491,7 +541,9 @@ export default function Round1() {
                   className="rounded-[1.5rem] border border-yellow-300/20 bg-yellow-400/10 px-5 py-5 text-right text-lg font-black text-yellow-100 transition hover:bg-yellow-400/15"
                 >
                   إعادة تفعيل التمرير للاعبين
-                  <div className="mt-2 text-xs font-semibold text-yellow-100/80">Reset Pass</div>
+                  <div className="mt-2 text-xs font-semibold text-yellow-100/80">
+                    Reset Pass
+                  </div>
                 </button>
               </div>
             </section>
@@ -505,13 +557,17 @@ export default function Round1() {
 
               <div className="grid gap-4 text-right">
                 <div className="rounded-[1.4rem] border border-white/10 bg-white/5 p-4">
-                  <div className="text-sm font-bold text-slate-400">اللاعب الحالي</div>
+                  <div className="text-sm font-bold text-slate-400">
+                    اللاعب الحالي
+                  </div>
                   <div className="mt-2 text-2xl font-black text-white">
                     {players[current].name}
                   </div>
                 </div>
                 <div className="rounded-[1.4rem] border border-white/10 bg-white/5 p-4">
-                  <div className="text-sm font-bold text-slate-400">السؤال التالي</div>
+                  <div className="text-sm font-bold text-slate-400">
+                    السؤال التالي
+                  </div>
                   <div className="mt-2 text-base font-bold text-white">
                     {round1QuestionIndex < settings.questionsCount
                       ? `متبقي ${settings.questionsCount - round1QuestionIndex} سؤال بعد الحالي`
@@ -519,7 +575,9 @@ export default function Round1() {
                   </div>
                 </div>
                 <div className="rounded-[1.4rem] border border-white/10 bg-white/5 p-4">
-                  <div className="text-sm font-bold text-slate-400">حالة الحسم</div>
+                  <div className="text-sm font-bold text-slate-400">
+                    حالة الحسم
+                  </div>
                   <div className="mt-2 text-base font-bold text-white">
                     {questionResolved
                       ? `${players[winnerIndex]?.name || "أحد اللاعبين"} كسب السؤال`
@@ -527,7 +585,6 @@ export default function Round1() {
                   </div>
                 </div>
               </div>
-
             </section>
           </aside>
         </div>
@@ -535,11 +592,26 @@ export default function Round1() {
         <OperatorHelpPanel
           accent="cyan"
           shortcuts={[
-            { keys: formatShortcutLabel(globalShortcuts.markMistake), label: "تسجيل خطأ على اللاعب الحالي" },
-            { keys: formatShortcutLabel(shortcuts.switchPlayer), label: "تبديل اللاعب" },
-            { keys: formatShortcutLabel(shortcuts.passTurn), label: `تمرير الدور حتى ${passLimit} مرة` },
-            { keys: formatShortcutLabel(globalShortcuts.timerToggle), label: "تشغيل أو إيقاف المؤقت" },
-            { keys: formatShortcutLabel(globalShortcuts.confirmAction), label: "إنهاء السؤال الحالي" },
+            {
+              keys: formatShortcutLabel(globalShortcuts.markMistake),
+              label: "تسجيل خطأ على اللاعب الحالي",
+            },
+            {
+              keys: formatShortcutLabel(shortcuts.switchPlayer),
+              label: "تبديل اللاعب",
+            },
+            {
+              keys: formatShortcutLabel(shortcuts.passTurn),
+              label: `تمرير الدور حتى ${passLimit} مرة`,
+            },
+            {
+              keys: formatShortcutLabel(globalShortcuts.timerToggle),
+              label: "تشغيل أو إيقاف المؤقت",
+            },
+            {
+              keys: formatShortcutLabel(globalShortcuts.confirmAction),
+              label: "إنهاء السؤال الحالي",
+            },
           ]}
           tips={[
             "ابدأ المؤقت فقط بعد كتابة السؤال حتى يظهر فوراً على شاشة الجمهور.",
