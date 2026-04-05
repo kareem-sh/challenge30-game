@@ -100,6 +100,14 @@ export const useGameStore = create(
         round1PassUsed[playerIndex] = Number(round1PassUsed[playerIndex] || 0) + 1;
         set({ round1PassUsed });
       },
+      setRound1PlayerPassUsed: (playerIndex, usedCount) => {
+        const round1PassUsed = [...get().round1PassUsed];
+
+        if (round1PassUsed[playerIndex] === undefined) return;
+
+        round1PassUsed[playerIndex] = Math.max(0, Number(usedCount) || 0);
+        set({ round1PassUsed });
+      },
       resetRound1Passes: () => set({ round1PassUsed: [0, 0] }),
 
       addScore: (player, pts) => {
@@ -108,9 +116,26 @@ export const useGameStore = create(
         set({ players });
       },
 
+      resetScores: () => {
+        const players = get().players.map((player) => ({ ...player, score: 0 }));
+        set({ players });
+      },
+
       addStrike: (player) => {
         const players = [...get().players];
         players[player].strikes += 1;
+        set({ players });
+      },
+
+      setPlayerStrikes: (player, strikes) => {
+        const players = [...get().players];
+
+        if (!players[player]) return;
+
+        players[player] = {
+          ...players[player],
+          strikes: Math.max(0, Number(strikes) || 0),
+        };
         set({ players });
       },
 

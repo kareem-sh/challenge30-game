@@ -2,7 +2,11 @@ import { useEffect, useEffectEvent } from "react";
 import { useGameStore } from "../app/gameStore";
 import { useSettingsStore } from "../app/settingsStore";
 import { getRoundName } from "../app/roundUtils";
-import { eventMatchesShortcut, formatShortcutLabel } from "../app/shortcutUtils";
+import {
+  eventMatchesShortcut,
+  formatShortcutLabel,
+  shouldIgnoreShortcutEvent,
+} from "../app/shortcutUtils";
 import RoundTimerDisplay from "../components/RoundTimerDisplay";
 import OperatorHelpPanel from "../components/OperatorHelpPanel";
 
@@ -11,6 +15,7 @@ export default function Round2() {
   const current = useGameStore((s) => s.currentPlayer);
   const setCurrentPlayer = useGameStore((s) => s.setCurrentPlayer);
   const addScore = useGameStore((s) => s.addScore);
+  const resetScores = useGameStore((s) => s.resetScores);
   const nextRound = useGameStore((s) => s.nextRound);
   const prevRound = useGameStore((s) => s.prevRound);
   const question = useGameStore((s) => s.question);
@@ -50,6 +55,7 @@ export default function Round2() {
     (bankQuestion) => bankQuestion.trim().length > 0,
   );
   const selectedBankQuestion = round2QuestionBank.includes(question) ? question : "";
+  const scoresAlreadyReset = players.every((player) => Number(player.score || 0) === 0);
 
   const handleTimerToggle = () => {
     if (timeRunning) {
@@ -73,6 +79,11 @@ export default function Round2() {
     setRound2CorrectCount(0);
     setRound2DeclaredValue(0);
     setRound2Phase("bidding");
+  };
+
+  const handleResetTimer = () => {
+    pauseTimer();
+    resetGlobalTimer(settings.time);
   };
 
   const startChallenge = (playerIndex) => {
@@ -140,9 +151,7 @@ export default function Round2() {
   })();
 
   const onGlobalKeydown = useEffectEvent((event) => {
-    const tagName = event.target?.tagName;
-
-    if (tagName === "INPUT" || tagName === "TEXTAREA") {
+    if (shouldIgnoreShortcutEvent(event)) {
       return;
     }
 
@@ -580,12 +589,34 @@ export default function Round2() {
                   إيقاف مؤقت
                 </button>
                 <button
-                  onClick={() => resetGlobalTimer(settings.time)}
+                  onClick={handleResetTimer}
                   className="rounded-[1.3rem] border border-yellow-300/20 bg-yellow-400/10 px-4 py-4 text-center text-base font-black text-yellow-100 transition hover:bg-yellow-400/15"
                 >
-                  إعادة 30 ثانية
+                  إعادة {settings.time} ثانية
                 </button>
               </div>
+            </section>
+
+            <section className="rounded-[2rem] border border-white/10 bg-slate-950/75 p-5 shadow-[0_24px_70px_rgba(15,23,42,0.35)] backdrop-blur-xl md:p-7">
+              <div className="mb-5 text-right">
+                <div className="text-[0.7rem] font-black uppercase tracking-[0.35em] text-slate-400">
+                  تحكم النقاط
+                </div>
+                <div className="mt-2 text-sm text-slate-500">
+                  استخدمه فقط إذا احتجت تصحيح النتيجة الحالية بسرعة.
+                </div>
+              </div>
+
+              <button
+                onClick={resetScores}
+                disabled={scoresAlreadyReset}
+                className="w-full rounded-[1.5rem] border border-rose-300/20 bg-rose-500/12 px-5 py-5 text-right text-lg font-black text-rose-100 transition hover:bg-rose-500/18 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                تصفير النقاط
+                <div className="mt-2 text-xs font-semibold text-rose-100/80">
+                  يعيد نقاط اللاعبين إلى صفر
+                </div>
+              </button>
             </section>
 
             <section className="rounded-[2rem] border border-white/10 bg-slate-950/75 p-5 shadow-[0_24px_70px_rgba(15,23,42,0.35)] backdrop-blur-xl md:p-7">
