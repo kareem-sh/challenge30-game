@@ -73,7 +73,6 @@ export default function Scoreboard() {
     mistakeLimit,
     mistakeTrigger,
     playFail,
-    playMistake,
     players,
     stopFail,
   ]);
