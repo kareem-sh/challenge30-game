@@ -12,8 +12,9 @@ export default function Timer({
   const roundIndex = useGameStore((s) => s.roundIndex);
   const roundsOrder = useGameStore((s) => s.roundsOrder);
   const timeRunning = useGameStore((s) => s.timeRunning);
+  const pauseTimer = useGameStore((s) => s.pauseTimer);
   const realtimeGlobalTimer = useRealtimeGlobalTimer();
-  
+
   const currentRound = roundsOrder[roundIndex];
   const previousGlobalTimer = useRef(realtimeGlobalTimer);
 
@@ -32,11 +33,20 @@ export default function Timer({
       previousGlobalTimer.current > 0 &&
       typeof onFinish === "function"
     ) {
+      pauseTimer();
       onFinish();
+    } else if (
+      playerIndex === null &&
+      currentRound !== 4 &&
+      timeRunning &&
+      realtimeGlobalTimer === 0 &&
+      previousGlobalTimer.current > 0
+    ) {
+      pauseTimer();
     }
 
     previousGlobalTimer.current = realtimeGlobalTimer;
-  }, [currentRound, onFinish, playerIndex, realtimeGlobalTimer, timeRunning]);
+  }, [currentRound, onFinish, pauseTimer, playerIndex, realtimeGlobalTimer, timeRunning]);
 
   // If playerIndex is provided (Round 4 Chess Clock)
   if (currentRound === 4 && playerIndex !== null) {

@@ -24,6 +24,19 @@ export default function useRealtimeGlobalTimer() {
     return () => window.clearInterval(intervalId);
   }, [currentRound, globalTimerStartedAt, timeRunning]);
 
+  useEffect(() => {
+    const currentValue = getCurrentGlobalTimerValue({
+      globalTimer,
+      globalTimerStartedAt,
+      timeRunning,
+      now,
+    });
+
+    if (currentRound !== 4 && timeRunning && currentValue === 0) {
+      useGameStore.getState().pauseTimer();
+    }
+  }, [currentRound, globalTimer, globalTimerStartedAt, now, timeRunning]);
+
   return getCurrentGlobalTimerValue({
     globalTimer,
     globalTimerStartedAt,

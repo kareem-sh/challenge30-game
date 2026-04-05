@@ -2,10 +2,7 @@ import { useEffect, useEffectEvent, useState } from "react";
 import { useGameStore } from "../app/gameStore";
 import { useSettingsStore } from "../app/settingsStore";
 import { getRoundName } from "../app/roundUtils";
-import {
-  eventMatchesShortcut,
-  formatShortcutLabel,
-} from "../app/shortcutUtils";
+import { eventMatchesShortcut, formatShortcutLabel } from "../app/shortcutUtils";
 import RoundTimerDisplay from "../components/RoundTimerDisplay";
 import StrikeMeter from "../components/StrikeMeter";
 import PassMeter from "../components/PassMeter";
@@ -15,9 +12,11 @@ export default function Round1() {
   const players = useGameStore((s) => s.players);
   const current = useGameStore((s) => s.currentPlayer);
   const addStrike = useGameStore((s) => s.addStrike);
+  const setPlayerStrikes = useGameStore((s) => s.setPlayerStrikes);
   const switchPlayer = useGameStore((s) => s.switchPlayer);
   const resetStrikes = useGameStore((s) => s.resetStrikes);
   const addScore = useGameStore((s) => s.addScore);
+  const resetScores = useGameStore((s) => s.resetScores);
   const nextRound = useGameStore((s) => s.nextRound);
   const prevRound = useGameStore((s) => s.prevRound);
   const question = useGameStore((s) => s.question);
@@ -28,6 +27,7 @@ export default function Round1() {
   const round1PassUsed = useGameStore((s) => s.round1PassUsed);
   const setRound1QuestionIndex = useGameStore((s) => s.setRound1QuestionIndex);
   const markRound1PassUsed = useGameStore((s) => s.markRound1PassUsed);
+  const setRound1PlayerPassUsed = useGameStore((s) => s.setRound1PlayerPassUsed);
   const resetRound1Passes = useGameStore((s) => s.resetRound1Passes);
   const globalTimer = useGameStore((s) => s.globalTimer);
   const setGlobalTimer = useGameStore((s) => s.setGlobalTimer);
@@ -60,9 +60,7 @@ export default function Round1() {
   const round1QuestionBank = (allSettings.questionBank?.round1 || []).filter(
     (bankQuestion) => bankQuestion.trim().length > 0,
   );
-  const selectedBankQuestion = round1QuestionBank.includes(question)
-    ? question
-    : "";
+  const selectedBankQuestion = round1QuestionBank.includes(question) ? question : "";
 
   const prepareTimer = () => {
     resetGlobalTimer(settings.time);
@@ -135,6 +133,33 @@ export default function Round1() {
     restartGlobalTimer(settings.time);
   };
 
+  const handleManualStrikeChange = (playerIndex, delta) => {
+    const player = players[playerIndex];
+
+    if (!player || delta === 0) return;
+
+    const nextStrikes = Math.max(
+      0,
+      Math.min(settings.mistakes, Number(player.strikes || 0) + delta),
+    );
+
+    if (nextStrikes === player.strikes) return;
+
+    setPlayerStrikes(playerIndex, nextStrikes);
+  };
+
+  const handleManualPassChange = (playerIndex, delta) => {
+    const usedCount = Number(round1PassUsed[playerIndex] || 0);
+
+    if (delta === 0) return;
+
+    const nextUsedCount = Math.max(0, Math.min(passLimit, usedCount + delta));
+
+    if (nextUsedCount === usedCount) return;
+
+    setRound1PlayerPassUsed(playerIndex, nextUsedCount);
+  };
+
   const finishCurrentQuestion = () => {
     pauseTimer();
     setTimeExpired(false);
@@ -143,6 +168,11 @@ export default function Round1() {
     if (round1QuestionIndex < settings.questionsCount) {
       setRound1QuestionIndex(round1QuestionIndex + 1);
     }
+  };
+
+  const handleResetTimer = () => {
+    pauseTimer();
+    resetGlobalTimer(settings.time);
   };
 
   useEffect(() => {
@@ -158,9 +188,7 @@ export default function Round1() {
   }, [isQuestionReady, questionResolved]);
 
   const onGlobalKeydown = useEffectEvent((event) => {
-    const tagName = event.target?.tagName;
-
-    if (tagName === "INPUT" || tagName === "TEXTAREA") {
+    if (shouldIgnoreShortcutEvent(event)) {
       return;
     }
 
@@ -425,13 +453,65 @@ export default function Round1() {
                         strikes={player.strikes}
                         maxStrikes={settings.mistakes}
                       />
+
+                      <div className="mt-4 flex items-center justify-between gap-3">
+                        <div className="text-xs font-bold text-slate-500">
+                          تعديل يدوي بدون تبديل الدور
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => handleManualStrikeChange(index, -1)}
+                            disabled={player.strikes <= 0}
+                            className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-black text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+                            aria-label={`تقليل أخطاء ${player.name}`}
+                          >
+                            -1
+                          </button>
+                          <button
+                            onClick={() => handleManualStrikeChange(index, 1)}
+                            disabled={player.strikes >= settings.mistakes}
+                            className="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-4 py-2 text-sm font-black text-cyan-100 transition hover:bg-cyan-400/15 disabled:cursor-not-allowed disabled:opacity-40"
+                            aria-label={`زيادة أخطاء ${player.name}`}
+                          >
+                            +1
+                          </button>
+                        </div>
+                      </div>
                     </div>
 
                     <div className="mt-5 flex justify-end">
-                      <PassMeter
-                        usedCount={Number(round1PassUsed[index] || 0)}
-                        totalCount={passLimit}
-                      />
+                      <div className="w-full">
+                        <PassMeter
+                          usedCount={Number(round1PassUsed[index] || 0)}
+                          totalCount={passLimit}
+                        />
+
+                        <div className="mt-4 flex items-center justify-between gap-3">
+                          <div className="text-xs font-bold text-slate-500">
+                            تعديل يدوي للتمرير بدون تبديل الدور
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => handleManualPassChange(index, 1)}
+                              disabled={Number(round1PassUsed[index] || 0) >= passLimit}
+                              className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-black text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+                              aria-label={`استهلاك تمرير من ${player.name}`}
+                            >
+                              -1
+                            </button>
+                            <button
+                              onClick={() => handleManualPassChange(index, -1)}
+                              disabled={Number(round1PassUsed[index] || 0) <= 0}
+                              className="rounded-full border border-violet-300/20 bg-violet-400/10 px-4 py-2 text-sm font-black text-violet-100 transition hover:bg-violet-400/15 disabled:cursor-not-allowed disabled:opacity-40"
+                              aria-label={`إرجاع تمرير إلى ${player.name}`}
+                            >
+                              +1
+                            </button>
+                          </div>
+                        </div>
+                      </div>
                     </div>
 
                     <div className="mt-8 rounded-[1.4rem] border border-white/10 bg-black/20 px-5 py-4 text-sm text-slate-300">
@@ -523,6 +603,16 @@ export default function Round1() {
                       {formatShortcutLabel(globalShortcuts.timerToggle)}
                     </div>
                   </button>
+
+                  <button
+                    onClick={handleResetTimer}
+                    className="rounded-[1.5rem] border border-sky-300/20 bg-sky-400/10 px-5 py-5 text-right text-lg font-black text-sky-100 transition hover:bg-sky-400/15 md:col-span-2"
+                  >
+                    تصفير المؤقت فقط
+                    <div className="mt-2 text-xs font-semibold text-sky-100/80">
+                      إعادة إلى {settings.time} ثانية
+                    </div>
+                  </button>
                 </div>
 
                 <button
@@ -543,6 +633,17 @@ export default function Round1() {
                   إعادة تفعيل التمرير للاعبين
                   <div className="mt-2 text-xs font-semibold text-yellow-100/80">
                     Reset Pass
+                  </div>
+                </button>
+
+                <button
+                  onClick={resetScores}
+                  disabled={scoresAlreadyReset}
+                  className="rounded-[1.5rem] border border-rose-300/20 bg-rose-500/12 px-5 py-5 text-right text-lg font-black text-rose-100 transition hover:bg-rose-500/18 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  تصفير النقاط
+                  <div className="mt-2 text-xs font-semibold text-rose-100/80">
+                    يعيد نقاط اللاعبين إلى صفر
                   </div>
                 </button>
               </div>
