@@ -25,6 +25,7 @@ export default function Round4() {
   const settings = useSettingsStore((s) => s.round4);
   const allSettings = useSettingsStore();
   const shortcuts = settings.shortcuts;
+  const defaultPoint = settings.defaultPoint ?? 2;
   const scoresAlreadyReset = players.every(
     (player) => Number(player.score || 0) === 0,
   );
@@ -126,7 +127,7 @@ export default function Round4() {
               </div>
             </div>
 
-            <div className="grid gap-3 text-right sm:grid-cols-3 xl:min-w-[620px]">
+            <div className="grid gap-3 text-right sm:grid-cols-2 xl:grid-cols-4 xl:min-w-[620px]">
               <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
                 <div className="text-[0.65rem] font-black uppercase tracking-[0.3em] text-slate-500">
                   اللاعب الحالي
@@ -141,6 +142,14 @@ export default function Round4() {
                 </div>
                 <div className="mt-3 text-2xl font-black text-white">
                   {format(settings.time)}
+                </div>
+              </div>
+              <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
+                <div className="text-[0.65rem] font-black uppercase tracking-[0.3em] text-slate-500">
+                  النقطة الافتراضية
+                </div>
+                <div className="mt-3 text-2xl font-black text-white">
+                  +{defaultPoint}
                 </div>
               </div>
               <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
@@ -263,10 +272,10 @@ export default function Round4() {
                 <div className="mt-8 grid gap-3 sm:grid-cols-2">
                   <button
                     type="button"
-                    onClick={() => addScore(index, 1)}
+                    onClick={() => addScore(index, defaultPoint)}
                     className="rounded-[2rem] border border-cyan-400/20 bg-cyan-500/10 px-5 py-4 text-sm font-black uppercase tracking-[0.12em] text-cyan-100 transition hover:bg-cyan-500/20"
                   >
-                    +1 نقطة
+                    +{defaultPoint} نقطة
                   </button>
                   <button
                     type="button"

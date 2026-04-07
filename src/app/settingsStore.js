@@ -69,6 +69,7 @@ const defaultSettingsState = {
 
   round4: {
     time: 120,
+    defaultPoint: 2,
     shortcuts: {
       switchPlayer: "space",
       startTimer: "s",
@@ -101,7 +102,9 @@ export const useSettingsStore = create(
 
       setQuestionsForRound: (roundKey, questions) =>
         set((state) => {
-          const normalizedQuestions = questions.map((question) => question ?? "");
+          const normalizedQuestions = questions.map(
+            (question) => question ?? "",
+          );
           const questionsCount = getFilledQuestionsCount(normalizedQuestions);
 
           return {
@@ -157,7 +160,8 @@ export const useSettingsStore = create(
               ...((persisted.round1 || {}).shortcuts || {}),
             },
             questionsCount: getFilledQuestionsCount(
-              (persisted.questionBank || {}).round1 || currentState.questionBank.round1,
+              (persisted.questionBank || {}).round1 ||
+                currentState.questionBank.round1,
             ),
           },
           round2: {
@@ -168,7 +172,8 @@ export const useSettingsStore = create(
               ...((persisted.round2 || {}).shortcuts || {}),
             },
             questionsCount: getFilledQuestionsCount(
-              (persisted.questionBank || {}).round2 || currentState.questionBank.round2,
+              (persisted.questionBank || {}).round2 ||
+                currentState.questionBank.round2,
             ),
           },
           round3: {

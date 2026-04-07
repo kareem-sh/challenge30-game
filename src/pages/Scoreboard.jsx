@@ -21,6 +21,7 @@ export default function Scoreboard() {
   const timeUpTrigger = useGameStore((s) => s.timeUpTrigger);
   const timeRunning = useGameStore((s) => s.timeRunning);
   const round2DeclaredValue = useGameStore((s) => s.round2DeclaredValue);
+  const round2CorrectCount = useGameStore((s) => s.round2CorrectCount);
   const settings = useSettingsStore();
   const realtimeGlobalTimer = useRealtimeGlobalTimer();
 
@@ -100,25 +101,36 @@ export default function Scoreboard() {
       <div className="absolute bottom-[-20%] left-[-10%] w-[600px] h-[600px] bg-pink-600/20 rounded-full blur-[150px] animate-pulse pointer-events-none" />
 
       <div
-        className={`transition-all duration-700 h-24 md:h-32 mb-10 bg-white/[0.03] backdrop-blur-3xl border border-white/10 rounded-[40px] flex items-center px-10 md:px-16 relative overflow-hidden ${
-          currentRound === 1
+        className={`transition-all duration-700 h-36 md:h-44 mb-10 bg-white/[0.03] backdrop-blur-3xl border border-white/10 rounded-[40px] flex items-center px-10 md:px-16 relative overflow-hidden ${
+          currentRound === 1 || currentRound === 2
             ? "opacity-100 scale-100"
             : "opacity-0 scale-95 pointer-events-none absolute"
         }`}
       >
         <div className="absolute top-0 right-0 h-1 w-full bg-white/5 overflow-hidden">
           <div
-            className="ml-auto h-full bg-gradient-to-l from-purple-500 to-pink-500 transition-[width] duration-300"
+            className={`ml-auto h-full transition-[width] duration-300 ${
+              currentRound === 1
+                ? "bg-gradient-to-l from-purple-500 to-pink-500"
+                : "bg-gradient-to-l from-yellow-500 to-orange-500"
+            }`}
             style={{
-              width: `${timeRunning ? round1Progress : round1Progress}%`,
+              width:
+                currentRound === 1
+                  ? `${timeRunning ? round1Progress : round1Progress}%`
+                  : "100%",
             }}
           />
         </div>
         <div className="flex flex-col items-start">
-          <span className="text-purple-500 font-black text-[10px] md:text-xs mb-2 tracking-[0.2em] uppercase">
-            التحدي الحالي
+          <span
+            className={`font-black text-[10px] md:text-xs mb-2 tracking-[0.2em] uppercase ${
+              currentRound === 2 ? "text-yellow-400" : "text-purple-500"
+            }`}
+          >
+            {currentRound === 2 ? "التحدي الحالي" : "السؤال الحالي"}
           </span>
-          <span className="text-2xl md:text-5xl font-bold text-white tracking-tight leading-tight">
+          <span className="text-5xl md:text-8xl font-bold text-white tracking-tight leading-tight">
             {question || "بانتظار التحدي القادم..."}
           </span>
         </div>
@@ -138,25 +150,9 @@ export default function Scoreboard() {
         </div>
 
         {currentRound === 1 && (
-          <div className="bg-white text-black px-12 py-4 rounded-[30px] shadow-[0_0_50px_rgba(255,255,255,0.2)]">
-            <div className="text-[4rem] md:text-[6rem] font-black italic tabular-nums leading-none">
+          <div className="bg-white text-black px-20 py-8 rounded-[30px] shadow-[0_0_50px_rgba(255,255,255,0.2)]">
+            <div className="text-[7rem] md:text-[9rem] font-black italic tabular-nums leading-none">
               <Timer />
-            </div>
-          </div>
-        )}
-
-        {currentRound === 2 && (
-          <div className="bg-white/5 backdrop-blur-3xl border border-white/10 px-6 md:px-10 py-5 md:py-7 rounded-[24px] md:rounded-[34px] min-w-[260px] md:min-w-[340px]">
-            <div className="text-center">
-              <div className="text-[10px] md:text-xs font-black tracking-[0.35em] text-yellow-300 uppercase">
-                عداد المزاد
-              </div>
-              <div className="mt-3 text-[4rem] md:text-[6.5rem] font-black leading-none tracking-tighter text-white tabular-nums">
-                {round2DeclaredValue}
-              </div>
-              <div className="mt-4 text-2xl md:text-4xl font-black italic tabular-nums text-yellow-200">
-                <Timer />
-              </div>
             </div>
           </div>
         )}
@@ -209,6 +205,33 @@ export default function Scoreboard() {
       </div>
 
       <div className="flex-1 grid grid-cols-2 gap-6 md:gap-16 relative z-10">
+        {currentRound === 2 && round2DeclaredValue > 0 && (
+          <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
+            <div
+              className={`bg-white/5 backdrop-blur-3xl border px-10 md:px-14 py-8 md:py-10 rounded-[24px] md:rounded-[34px] min-w-[350px] md:min-w-[450px] transition-all duration-500 ${
+                round2CorrectCount === round2DeclaredValue
+                  ? "border-yellow-400 shadow-[0_0_50px_rgba(250,204,21,0.8)] animate-pulse scale-110"
+                  : "border-white/10"
+              }`}
+            >
+              <div className="text-center">
+                <div className="text-xl md:text-2xl font-black text-yellow-200 mb-2">
+                  {players[currentPlayer]?.name || ""}
+                </div>
+                <div className="text-sm md:text-base font-black tracking-[0.35em] text-yellow-300 uppercase">
+                  الإجابات الصحيحة
+                </div>
+                <div className="mt-4 text-[8rem] md:text-[10rem] font-black leading-none tracking-tighter text-white tabular-nums">
+                  {round2CorrectCount}/{round2DeclaredValue}
+                </div>
+                <div className="mt-6 text-6xl md:text-8xl font-black italic tabular-nums text-yellow-200">
+                  <Timer />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {players.map((player, index) => (
           <div
             key={index}
@@ -378,7 +401,9 @@ export default function Scoreboard() {
               ? "وضع السرعة"
               : currentRound === 4
                 ? currentRoundName
-                : "التحدي الحالي"}
+                : currentRound === 2
+                  ? "حالة التحدي"
+                  : "التحدي الحالي"}
           </span>
           <span className="text-2xl md:text-5xl font-bold text-white tracking-tight">
             {currentRound === 3
@@ -387,7 +412,9 @@ export default function Scoreboard() {
                 ? round4ActivePlayerExpired
                   ? `انتهى وقت ${players[currentPlayer]?.name || ""}`
                   : `الوقت يعمل الآن لـ ${players[currentPlayer]?.name || ""}`
-                : question || "بانتظار التحدي القادم..."}
+                : currentRound === 2
+                  ? `اللاعب الحالي: ${players[currentPlayer]?.name || ""}`
+                  : question || "بانتظار التحدي القادم..."}
           </span>
         </div>
       </div>

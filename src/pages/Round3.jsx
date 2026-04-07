@@ -22,7 +22,9 @@ export default function Round3() {
   const roundTitle = getRoundName(allSettings, 3);
   const shortcuts = settings.shortcuts;
   const globalShortcuts = allSettings.globalShortcuts;
-  const scoresAlreadyReset = players.every((player) => Number(player.score || 0) === 0);
+  const scoresAlreadyReset = players.every(
+    (player) => Number(player.score || 0) === 0,
+  );
 
   const awardPoints = (playerIndex, points) => {
     setCurrentPlayer(playerIndex);
@@ -112,8 +114,8 @@ export default function Round3() {
                   {roundTitle}
                 </h1>
                 <p className="mt-3 max-w-3xl text-base leading-7 text-slate-300 md:text-lg">
-                  اضغط بسرعة على أزرار +1 أو +2 لكل لاعب. النتيجة تُحدَّث فوراً على شاشة
-                  الجمهور مع إبراز اللاعب الحالي.
+                  اضغط بسرعة على أزرار -1 أو +1 أو +2 لكل لاعب. النتيجة تُحدَّث
+                  فوراً على شاشة الجمهور مع إبراز اللاعب الحالي.
                 </p>
               </div>
             </div>
@@ -140,7 +142,10 @@ export default function Round3() {
                   اختصارات
                 </div>
                 <div className="mt-3 text-lg font-black text-white">
-                  {formatShortcutLabel(shortcuts.playerOneSingle)} {formatShortcutLabel(shortcuts.playerOneDouble)} | {formatShortcutLabel(shortcuts.playerTwoSingle)} {formatShortcutLabel(shortcuts.playerTwoDouble)}
+                  {formatShortcutLabel(shortcuts.playerOneSingle)}{" "}
+                  {formatShortcutLabel(shortcuts.playerOneDouble)} |{" "}
+                  {formatShortcutLabel(shortcuts.playerTwoSingle)}{" "}
+                  {formatShortcutLabel(shortcuts.playerTwoDouble)}
                 </div>
               </div>
             </div>
@@ -153,8 +158,8 @@ export default function Round3() {
               تحديد اللاعب الحالي
             </div>
             <div className="mt-2 text-sm text-slate-500">
-              اختر اللاعب النشط أولاً أو دع الأزرار تغيّر اللاعب تلقائياً عند احتساب
-              النقاط.
+              اختر اللاعب النشط أولاً أو دع الأزرار تغيّر اللاعب تلقائياً عند
+              احتساب النقاط.
             </div>
           </div>
 
@@ -172,7 +177,9 @@ export default function Round3() {
                 <div className="text-xs font-black uppercase tracking-[0.32em] text-slate-500">
                   {current === index ? "نشط الآن" : "تفعيل اللاعب"}
                 </div>
-                <div className="mt-3 text-3xl font-black text-white">{player.name}</div>
+                <div className="mt-3 text-3xl font-black text-white">
+                  {player.name}
+                </div>
               </button>
             ))}
           </div>
@@ -222,13 +229,25 @@ export default function Round3() {
                   </div>
                 </div>
 
-                <div className="mt-8 grid gap-4 md:grid-cols-2">
+                <div className="mt-8 grid gap-4 md:grid-cols-3">
+                  <button
+                    onClick={() => awardPoints(index, -1)}
+                    className="rounded-[1.9rem] bg-rose-600 px-6 py-10 text-center text-[clamp(2rem,4vw,3.4rem)] font-black text-white shadow-[0_22px_50px_rgba(244,63,94,0.28)] transition hover:bg-rose-500 active:scale-[0.98]"
+                  >
+                    -1
+                    <div className="mt-3 text-sm font-bold text-white/80">
+                      خصم نقطة
+                    </div>
+                  </button>
+
                   <button
                     onClick={() => awardPoints(index, settings.singlePoint)}
                     className="rounded-[1.9rem] bg-emerald-500 px-6 py-10 text-center text-[clamp(2rem,4vw,3.4rem)] font-black text-white shadow-[0_22px_50px_rgba(16,185,129,0.28)] transition hover:bg-emerald-400 active:scale-[0.98]"
                   >
                     +{settings.singlePoint}
-                    <div className="mt-3 text-sm font-bold text-white/80">نقطة سريعة</div>
+                    <div className="mt-3 text-sm font-bold text-white/80">
+                      نقطة سريعة
+                    </div>
                   </button>
 
                   <button
@@ -236,7 +255,9 @@ export default function Round3() {
                     className="rounded-[1.9rem] bg-fuchsia-600 px-6 py-10 text-center text-[clamp(2rem,4vw,3.4rem)] font-black text-white shadow-[0_22px_50px_rgba(192,38,211,0.28)] transition hover:bg-fuchsia-500 active:scale-[0.98]"
                   >
                     +{settings.doublePoint}
-                    <div className="mt-3 text-sm font-bold text-white/80">أداء ممتاز</div>
+                    <div className="mt-3 text-sm font-bold text-white/80">
+                      أداء ممتاز
+                    </div>
                   </button>
                 </div>
               </article>
@@ -262,6 +283,7 @@ export default function Round3() {
           ]}
           tips={[
             "الأزرار تغيّر اللاعب الحالي تلقائياً عند احتساب النقاط.",
+            "استخدم -1 لتصحيح الأخطاء أو تعديل النقاط بسرعة.",
             "استخدم +2 فقط عندما يكون الأداء واضحاً حتى يبقى القرار سريعاً.",
             "ثبّت اللاعب الحالي أولاً إذا كنت تريد توجيه الانتباه على شاشة الجمهور.",
           ]}

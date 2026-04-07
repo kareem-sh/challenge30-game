@@ -49,9 +49,10 @@ export default function Round2() {
   const roundTitle = getRoundName(allSettings, 2);
   const shortcuts = settings.shortcuts;
   const globalShortcuts = allSettings.globalShortcuts;
-  const challengePoints = Math.floor(
-    round2DeclaredValue / settings.namesForPoint,
-  );
+  const challengePoints =
+    round2DeclaredValue > 0
+      ? Math.max(1, Math.floor(round2DeclaredValue / settings.namesForPoint))
+      : 0;
   const successReady =
     round2DeclaredValue > 0 && round2CorrectCount >= round2DeclaredValue;
   const underHalfReached =
