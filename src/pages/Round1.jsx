@@ -69,6 +69,10 @@ export default function Round1() {
   const globalShortcuts = allSettings.globalShortcuts;
   const currentPlayerPassUsed = Number(round1PassUsed[current] || 0);
   const currentPlayerHasPass = currentPlayerPassUsed < passLimit;
+  const currentPlayerPassRemaining = Math.max(
+    0,
+    passLimit - currentPlayerPassUsed,
+  );
   // COMMENTED: Timer functionality disabled for manual Round 1
   // const [timeExpired, setTimeExpired] = useState(false);
   // const prevNaturalEndToken = useRef(globalTimerNaturalEndToken);
@@ -311,10 +315,10 @@ export default function Round1() {
   // }, [pauseTimer, questionResolved]);
 
   const statusMessage = questionResolved
-    ? `تم حسم السؤال لصالح ${players[winnerIndex]?.name || ""}`
+    ? `حُسم السؤال لـ ${players[winnerIndex]?.name || ""}`
     : isQuestionReady
-      ? "السؤال جاهز - الجولة الآن يدوية بدون مؤقت"
-      : "أدخل موضوع السؤال أولاً";
+      ? "السؤال جاهز"
+      : "اكتب السؤال أولاً";
 
   return (
     <div
@@ -344,24 +348,32 @@ export default function Round1() {
                   {roundTitle}
                 </h1>
                 <p className="mt-3 max-w-3xl text-base leading-7 text-slate-300 md:text-lg">
-                  واجهة تشغيل سريعة وواضحة للتقني، مع عرض حيّ للدور الحالي،
-                  الأخطاء، المؤقت، وحسم النقاط وفق إعدادات الجولة.
+                  اكتب السؤال ثم استخدم الأزرار الكبيرة لإدارة الدور بشكل واضح
+                  وسريع.
                 </p>
               </div>
             </div>
 
-            <div className="grid gap-3 text-right sm:grid-cols-3 xl:min-w-[560px]">
+            <div className="grid gap-3 text-right sm:grid-cols-2 xl:min-w-[520px]">
               <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
                 <div className="text-[0.65rem] font-black uppercase tracking-[0.3em] text-slate-500">
-                  زمن المحاولة
+                  السؤال الحالي
                 </div>
                 <div className="mt-3 text-3xl font-black text-white">
-                  {settings.time} ث
+                  {round1QuestionIndex} / {settings.questionsCount}
                 </div>
               </div>
               <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
                 <div className="text-[0.65rem] font-black uppercase tracking-[0.3em] text-slate-500">
-                  حد الأخطاء
+                  الدور الآن
+                </div>
+                <div className="mt-3 text-3xl font-black text-white">
+                  {players[current]?.name}
+                </div>
+              </div>
+              <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
+                <div className="text-[0.65rem] font-black uppercase tracking-[0.3em] text-slate-500">
+                  الأخطاء المسموحة
                 </div>
                 <div className="mt-3 text-3xl font-black text-white">
                   {settings.mistakes}
@@ -369,21 +381,10 @@ export default function Round1() {
               </div>
               <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
                 <div className="text-[0.65rem] font-black uppercase tracking-[0.3em] text-slate-500">
-                  منح النقاط
-                </div>
-                <div className="mt-3 text-lg font-black text-white">
-                  {settings.normalPoint} / {settings.perfectPoint}
-                </div>
-              </div>
-              <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4 sm:col-span-3 xl:col-span-1">
-                <div className="text-[0.65rem] font-black uppercase tracking-[0.3em] text-slate-500">
-                  عدد التمريرات
+                  التمرير المتبقي
                 </div>
                 <div className="mt-3 text-3xl font-black text-white">
-                  {settings.passCount}
-                </div>
-                <div className="mt-1 text-xs font-bold text-slate-400">
-                  لكل لاعب في السؤال
+                  {currentPlayerPassRemaining}
                 </div>
               </div>
             </div>
@@ -396,11 +397,10 @@ export default function Round1() {
               <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div className="text-right">
                   <div className="text-[0.7rem] font-black uppercase tracking-[0.35em] text-slate-400">
-                    موضوع السؤال الحالي
+                    السؤال
                   </div>
                   <div className="mt-2 text-sm text-slate-500">
-                    اختر السؤال من بنك الأسئلة أو اكتب عنوان التحدي يدوياً ليظهر
-                    فوراً على شاشة الجمهور.
+                    اختره من القائمة أو اكتبه مباشرة.
                   </div>
                 </div>
                 <div
@@ -418,7 +418,7 @@ export default function Round1() {
               <div className="mb-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto]">
                 <div className="space-y-2 text-right">
                   <div className="text-[0.68rem] font-black uppercase tracking-[0.32em] text-slate-500">
-                    بنك الأسئلة
+                    أسئلة محفوظة
                   </div>
                   <select
                     value={selectedBankQuestion}
@@ -441,7 +441,7 @@ export default function Round1() {
                   onClick={() => setQuestion("")}
                   className="rounded-[1.2rem] border border-white/10 bg-white/5 px-5 py-4 text-sm font-black text-white transition hover:bg-white/10 lg:self-end"
                 >
-                  تفريغ الحقل
+                  مسح
                 </button>
               </div>
 
@@ -606,11 +606,8 @@ export default function Round1() {
                     </div>
 
                     <div className="mt-8 rounded-[1.4rem] border border-white/10 bg-black/20 px-5 py-4 text-sm text-slate-300">
-                      {isWinner
-                        ? `حصل على ${players[index].score} نقطة إجمالية بعد هذا السؤال.`
-                        : player.strikes === 0
-                          ? `بدون أخطاء. استُخدم ${Number(round1PassUsed[index] || 0)} من ${passLimit} تمريرات.`
-                          : `سجّل ${player.strikes} من ${settings.mistakes} أخطاء، واستُخدم ${Number(round1PassUsed[index] || 0)} من ${passLimit} تمريرات.`}
+                      أخطاء {player.strikes} من {settings.mistakes} • تمرير
+                      مستخدم {Number(round1PassUsed[index] || 0)} من {passLimit}
                     </div>
                   </article>
                 );
@@ -631,7 +628,7 @@ export default function Round1() {
                   لوحة التحكم السريعة
                 </div>
                 <div className="mt-2 text-sm text-slate-500">
-                  أزرار كبيرة لتقليل الخطأ أثناء البث المباشر.
+                  استخدم هذه الأزرار أثناء اللعب.
                 </div>
               </div>
 
@@ -642,9 +639,6 @@ export default function Round1() {
                   className="rounded-[1.7rem] bg-gradient-to-l from-rose-600 to-orange-400 px-6 py-6 text-right text-2xl font-black text-white shadow-[0_24px_50px_rgba(244,63,94,0.3)] transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   خطأ على {players[current].name}
-                  <div className="mt-2 text-sm font-semibold text-white/80">
-                    الاختصار {formatShortcutLabel(globalShortcuts.markMistake)}
-                  </div>
                 </button>
 
                 <div className="grid gap-4 md:grid-cols-2">
@@ -654,9 +648,6 @@ export default function Round1() {
                     className="rounded-[1.5rem] border border-cyan-400/20 bg-cyan-400/10 px-5 py-5 text-right text-lg font-black text-cyan-100 transition hover:bg-cyan-400/15 disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     تبديل إلى {players[other].name}
-                    <div className="mt-2 text-xs font-semibold text-cyan-200/80">
-                      {formatShortcutLabel(shortcuts.switchPlayer)}
-                    </div>
                   </button>
 
                   <button
@@ -671,7 +662,7 @@ export default function Round1() {
                     تمرير الدور إلى {players[other].name}
                     <div className="mt-2 text-xs font-semibold text-violet-100/80">
                       {currentPlayerHasPass
-                        ? `${formatShortcutLabel(shortcuts.passTurn)} - متبقي ${passLimit - currentPlayerPassUsed}`
+                        ? `متبقي ${currentPlayerPassRemaining}`
                         : "استُنفدت التمريرات"}
                     </div>
                   </button>
@@ -705,18 +696,15 @@ export default function Round1() {
                 >
                   إنهاء السؤال الحالي والانتقال لرقم{" "}
                   {Math.min(round1QuestionIndex + 1, settings.questionsCount)}
-                  <div className="mt-2 text-xs font-semibold text-emerald-100/80">
-                    {formatShortcutLabel(globalShortcuts.confirmAction)}
-                  </div>
                 </button>
 
                 <button
                   onClick={resetRound1Passes}
                   className="rounded-[1.5rem] border border-yellow-300/20 bg-yellow-400/10 px-5 py-5 text-right text-lg font-black text-yellow-100 transition hover:bg-yellow-400/15"
                 >
-                  إعادة تفعيل التمرير للاعبين
+                  إعادة التمرير للجميع
                   <div className="mt-2 text-xs font-semibold text-yellow-100/80">
-                    Reset Pass
+                    يعيد عدد التمريرات في هذا السؤال
                   </div>
                 </button>
 
@@ -736,11 +724,10 @@ export default function Round1() {
             <section className="rounded-[2rem] border border-white/10 bg-slate-950/75 p-5 shadow-[0_24px_70px_rgba(15,23,42,0.35)] backdrop-blur-xl md:p-7">
               <div className="mb-5 text-right">
                 <div className="text-[0.7rem] font-black uppercase tracking-[0.35em] text-slate-400">
-                  تحكم يدوي بنتيجة الجولة
+                  تصحيح يدوي عند الحاجة
                 </div>
                 <div className="mt-2 text-sm text-slate-500">
-                  اضبط النقاط أو الأخطاء يدويًا إذا احتجت إلى تصحيح نتيجة
-                  السؤال.
+                  استخدمه فقط إذا احتجت تعديل النقاط أو الأخطاء.
                 </div>
               </div>
 
@@ -795,44 +782,6 @@ export default function Round1() {
               </div>
             </section>
 
-            <section className="rounded-[2rem] border border-white/10 bg-slate-950/75 p-5 shadow-[0_24px_70px_rgba(15,23,42,0.35)] backdrop-blur-xl md:p-7">
-              <div className="mb-5 text-right">
-                <div className="text-[0.7rem] font-black uppercase tracking-[0.35em] text-slate-400">
-                  حالة الجولة
-                </div>
-              </div>
-
-              <div className="grid gap-4 text-right">
-                <div className="rounded-[1.4rem] border border-white/10 bg-white/5 p-4">
-                  <div className="text-sm font-bold text-slate-400">
-                    اللاعب الحالي
-                  </div>
-                  <div className="mt-2 text-2xl font-black text-white">
-                    {players[current].name}
-                  </div>
-                </div>
-                <div className="rounded-[1.4rem] border border-white/10 bg-white/5 p-4">
-                  <div className="text-sm font-bold text-slate-400">
-                    السؤال التالي
-                  </div>
-                  <div className="mt-2 text-base font-bold text-white">
-                    {round1QuestionIndex < settings.questionsCount
-                      ? `متبقي ${settings.questionsCount - round1QuestionIndex} سؤال بعد الحالي`
-                      : "هذا هو السؤال الأخير في الجولة"}
-                  </div>
-                </div>
-                <div className="rounded-[1.4rem] border border-white/10 bg-white/5 p-4">
-                  <div className="text-sm font-bold text-slate-400">
-                    حالة الحسم
-                  </div>
-                  <div className="mt-2 text-base font-bold text-white">
-                    {questionResolved
-                      ? `${players[winnerIndex]?.name || "أحد اللاعبين"} كسب السؤال`
-                      : "السؤال ما زال مفتوحاً"}
-                  </div>
-                </div>
-              </div>
-            </section>
           </aside>
         </div>
 
@@ -841,7 +790,7 @@ export default function Round1() {
           shortcuts={[
             {
               keys: formatShortcutLabel(globalShortcuts.markMistake),
-              label: "تسجيل خطأ على اللاعب الحالي",
+              label: "خطأ على اللاعب الحالي",
             },
             {
               keys: formatShortcutLabel(shortcuts.switchPlayer),
@@ -849,11 +798,7 @@ export default function Round1() {
             },
             {
               keys: formatShortcutLabel(shortcuts.passTurn),
-              label: `تمرير الدور حتى ${passLimit} مرة`,
-            },
-            {
-              keys: formatShortcutLabel(globalShortcuts.timerToggle),
-              label: "تشغيل أو إيقاف المؤقت",
+              label: "تمرير الدور",
             },
             {
               keys: formatShortcutLabel(globalShortcuts.confirmAction),
@@ -861,10 +806,9 @@ export default function Round1() {
             },
           ]}
           tips={[
-            "ابدأ المؤقت فقط بعد كتابة السؤال حتى يظهر فوراً على شاشة الجمهور.",
-            "استخدم التمرير عند الحاجة فقط لأنه محدود لكل سؤال.",
-            "عند وصول لاعب لحد الأخطاء تُحسم النقاط تلقائياً حسب الإعدادات.",
-            "إذا انتهى الوقت يمكنك التبديل أو التمرير دون تسجيل خطأ، أو زر الخطأ لتسجيل خطأ وتشغيل الوقت للاعب الآخر.",
+            "ابدأ بكتابة السؤال أو اختياره من القائمة.",
+            "استخدم التمرير فقط عند الحاجة لأنه محدود لكل لاعب.",
+            "عند وصول لاعب لحد الأخطاء تُحسب النقطة تلقائياً للطرف الآخر.",
           ]}
           onPrev={prevRound}
           onNext={nextRound}

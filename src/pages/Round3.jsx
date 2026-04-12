@@ -114,13 +114,12 @@ export default function Round3() {
                   {roundTitle}
                 </h1>
                 <p className="mt-3 max-w-3xl text-base leading-7 text-slate-300 md:text-lg">
-                  اضغط بسرعة على أزرار -1 أو +1 أو +2 لكل لاعب. النتيجة تُحدَّث
-                  فوراً على شاشة الجمهور مع إبراز اللاعب الحالي.
+                  اضغط على زر اللاعب مباشرة لإضافة النقاط أو تصحيحها.
                 </p>
               </div>
             </div>
 
-            <div className="grid gap-3 text-right sm:grid-cols-3 xl:min-w-[620px]">
+            <div className="grid gap-3 text-right sm:grid-cols-2 xl:min-w-[520px]">
               <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
                 <div className="text-[0.65rem] font-black uppercase tracking-[0.3em] text-slate-500">
                   اللاعب الحالي
@@ -131,21 +130,10 @@ export default function Round3() {
               </div>
               <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
                 <div className="text-[0.65rem] font-black uppercase tracking-[0.3em] text-slate-500">
-                  أسرع إضافة
+                  الأزرار الأساسية
                 </div>
                 <div className="mt-3 text-lg font-black text-white">
                   +{settings.singlePoint} أو +{settings.doublePoint}
-                </div>
-              </div>
-              <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
-                <div className="text-[0.65rem] font-black uppercase tracking-[0.3em] text-slate-500">
-                  اختصارات
-                </div>
-                <div className="mt-3 text-lg font-black text-white">
-                  {formatShortcutLabel(shortcuts.playerOneSingle)}{" "}
-                  {formatShortcutLabel(shortcuts.playerOneDouble)} |{" "}
-                  {formatShortcutLabel(shortcuts.playerTwoSingle)}{" "}
-                  {formatShortcutLabel(shortcuts.playerTwoDouble)}
                 </div>
               </div>
             </div>
@@ -158,8 +146,7 @@ export default function Round3() {
               تحديد اللاعب الحالي
             </div>
             <div className="mt-2 text-sm text-slate-500">
-              اختر اللاعب النشط أولاً أو دع الأزرار تغيّر اللاعب تلقائياً عند
-              احتساب النقاط.
+              يمكنك تغييره من هنا إذا احتجت.
             </div>
           </div>
 
@@ -246,7 +233,7 @@ export default function Round3() {
                   >
                     +{settings.singlePoint}
                     <div className="mt-3 text-sm font-bold text-white/80">
-                      نقطة سريعة
+                      إضافة بسيطة
                     </div>
                   </button>
 
@@ -256,7 +243,7 @@ export default function Round3() {
                   >
                     +{settings.doublePoint}
                     <div className="mt-3 text-sm font-bold text-white/80">
-                      أداء ممتاز
+                      إضافة كبيرة
                     </div>
                   </button>
                 </div>
@@ -270,11 +257,11 @@ export default function Round3() {
           shortcuts={[
             {
               keys: `${formatShortcutLabel(shortcuts.playerOneSingle)} / ${formatShortcutLabel(shortcuts.playerOneDouble)}`,
-              label: `+${settings.singlePoint} أو +${settings.doublePoint} للاعب 1`,
+              label: `إضافة نقاط للاعب 1`,
             },
             {
               keys: `${formatShortcutLabel(shortcuts.playerTwoSingle)} / ${formatShortcutLabel(shortcuts.playerTwoDouble)}`,
-              label: `+${settings.singlePoint} أو +${settings.doublePoint} للاعب 2`,
+              label: `إضافة نقاط للاعب 2`,
             },
             {
               keys: `${formatShortcutLabel(globalShortcuts.playerOne)} / ${formatShortcutLabel(globalShortcuts.playerTwo)}`,
@@ -282,10 +269,9 @@ export default function Round3() {
             },
           ]}
           tips={[
-            "الأزرار تغيّر اللاعب الحالي تلقائياً عند احتساب النقاط.",
-            "استخدم -1 لتصحيح الأخطاء أو تعديل النقاط بسرعة.",
-            "استخدم +2 فقط عندما يكون الأداء واضحاً حتى يبقى القرار سريعاً.",
-            "ثبّت اللاعب الحالي أولاً إذا كنت تريد توجيه الانتباه على شاشة الجمهور.",
+            "اضغط على بطاقة اللاعب نفسه لإضافة النقاط بسرعة.",
+            "استخدم -1 فقط عند الحاجة لتصحيح النتيجة.",
+            "يمكنك تحديد اللاعب الحالي يدوياً إذا أردت إبراز اسمه على الشاشة.",
           ]}
           onPrev={prevRound}
           onNext={nextRound}

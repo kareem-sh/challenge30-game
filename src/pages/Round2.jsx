@@ -293,35 +293,42 @@ export default function Round2() {
                   {roundTitle}
                 </h1>
                 <p className="mt-3 max-w-3xl text-base leading-7 text-slate-300 md:text-lg">
-                  شاشة تشغيل واضحة لإدارة الإعلان، تثبيت اللاعب الذي قبل التحدي،
-                  وضبط النتيجة النهائية بسرعة وبدقة.
+                  حدد الموضوع، اختر العدد، ثم ابدأ التحدي مع اللاعب الصحيح.
                 </p>
               </div>
             </div>
 
-            <div className="grid gap-3 text-right sm:grid-cols-3 xl:min-w-[560px]">
+            <div className="grid gap-3 text-right sm:grid-cols-2 xl:min-w-[560px]">
               <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
                 <div className="text-[0.65rem] font-black uppercase tracking-[0.3em] text-slate-500">
-                  زمن التحدي
+                  الخطوة الحالية
+                </div>
+                <div className="mt-3 text-3xl font-black text-white">
+                  {isBiddingPhase ? "اختيار العدد" : "التحدي"}
+                </div>
+              </div>
+              <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
+                <div className="text-[0.65rem] font-black uppercase tracking-[0.3em] text-slate-500">
+                  العدد الحالي
+                </div>
+                <div className="mt-3 text-3xl font-black text-white tabular-nums">
+                  {round2DeclaredValue}
+                </div>
+              </div>
+              <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
+                <div className="text-[0.65rem] font-black uppercase tracking-[0.3em] text-slate-500">
+                  اللاعب الحالي
+                </div>
+                <div className="mt-3 text-2xl font-black text-white">
+                  {players[current]?.name}
+                </div>
+              </div>
+              <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
+                <div className="text-[0.65rem] font-black uppercase tracking-[0.3em] text-slate-500">
+                  وقت التحدي
                 </div>
                 <div className="mt-3 text-3xl font-black text-white">
                   {settings.time} ث
-                </div>
-              </div>
-              <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
-                <div className="text-[0.65rem] font-black uppercase tracking-[0.3em] text-slate-500">
-                  التسعير
-                </div>
-                <div className="mt-3 text-lg font-black text-white">
-                  نقطة لكل {settings.namesForPoint}
-                </div>
-              </div>
-              <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
-                <div className="text-[0.65rem] font-black uppercase tracking-[0.3em] text-slate-500">
-                  الفشل
-                </div>
-                <div className="mt-3 text-lg font-black text-white">
-                  {settings.normalPoint} / {settings.bonusPoint}
                 </div>
               </div>
             </div>
@@ -333,17 +340,17 @@ export default function Round2() {
             <section className="rounded-[2rem] border border-white/10 bg-slate-950/75 p-5 shadow-[0_24px_70px_rgba(15,23,42,0.35)] backdrop-blur-xl md:p-7">
               <div className="mb-5 text-right">
                 <div className="text-[0.7rem] font-black uppercase tracking-[0.35em] text-slate-400">
-                  موضوع المزاد
+                  الموضوع
                 </div>
                 <div className="mt-2 text-sm text-slate-500">
-                  اختر موضوعاً محفوظاً من بنك الأسئلة أو اكتب التصنيف يدوياً.
+                  اختره من القائمة أو اكتبه مباشرة.
                 </div>
               </div>
 
               <div className="mb-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto]">
                 <div className="space-y-2 text-right">
                   <div className="text-[0.68rem] font-black uppercase tracking-[0.32em] text-slate-500">
-                    بنك أسئلة المزاد
+                    أسئلة محفوظة
                   </div>
                   <select
                     value={selectedBankQuestion}
@@ -366,7 +373,7 @@ export default function Round2() {
                   onClick={() => setQuestion("")}
                   className="rounded-[1.2rem] border border-white/10 bg-white/5 px-5 py-4 text-sm font-black text-white transition hover:bg-white/10 lg:self-end"
                 >
-                  تفريغ الحقل
+                  مسح
                 </button>
               </div>
 
@@ -383,11 +390,10 @@ export default function Round2() {
                 <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                   <div className="text-right">
                     <div className="text-[0.7rem] font-black uppercase tracking-[0.35em] text-slate-400">
-                      مرحلة إعلان العدد
+                      حدد العدد ثم اختر اللاعب
                     </div>
                     <div className="mt-2 text-sm text-slate-500">
-                      ثبّت العدد أولاً ثم اختر اللاعب الذي سيلتزم به ليظهر الـ
-                      popup مباشرة للجمهور.
+                      بعد تحديد العدد اضغط على اسم اللاعب لبدء التحدي.
                     </div>
                   </div>
 
@@ -458,12 +464,12 @@ export default function Round2() {
                       className="rounded-[2rem] border border-white/10 bg-white/5 p-6 text-right transition hover:border-yellow-300/35 hover:bg-white/[0.08] disabled:cursor-not-allowed disabled:opacity-40"
                     >
                       <div className="flex items-start justify-between gap-4">
-                        <div>
-                          <div className="text-xs font-black uppercase tracking-[0.32em] text-slate-500">
-                            بدء التحدي لهذا اللاعب
-                          </div>
-                          <div className="mt-3 text-3xl font-black text-white">
-                            {player.name}
+                          <div>
+                            <div className="text-xs font-black uppercase tracking-[0.32em] text-slate-500">
+                              ابدأ مع هذا اللاعب
+                            </div>
+                            <div className="mt-3 text-3xl font-black text-white">
+                              {player.name}
                           </div>
                         </div>
 
@@ -485,7 +491,7 @@ export default function Round2() {
                 <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                   <div className="text-right">
                     <div className="text-[0.7rem] font-black uppercase tracking-[0.35em] text-slate-400">
-                      التحدي الجاري
+                      عد الإجابات الصحيحة
                     </div>
                     <div className="mt-3 text-[clamp(1.8rem,2.6vw,3rem)] font-black text-white">
                       {players[current].name}
@@ -542,14 +548,14 @@ export default function Round2() {
 
                   <div className="mb-6 rounded-[1.4rem] border border-white/10 bg-white/5 px-5 py-4 text-right">
                     <div className="text-sm font-bold text-slate-400">
-                      مؤشر الحسم
+                      النتيجة الجاهزة
                     </div>
                     <div className="mt-2 text-lg font-black text-white">
                       {successReady
-                        ? "العدد المحقق يطابق العدد المعلن ويمكن اعتماد النجاح"
+                        ? "يمكن اعتماد النجاح الآن"
                         : underHalfReached
-                          ? "العدد المحقق أقل من النصف ويمكن اعتماد +2 للاعب الآخر"
-                          : "إذا وُجد خطأ بالأسماء اعتمد زر الخطأ، أو أكمل العد الصحيح"}
+                          ? "يمكن اعتماد أقل من النصف"
+                          : "واصل العد أو اختر نتيجة أخرى"}
                     </div>
                   </div>
 
@@ -592,7 +598,7 @@ export default function Round2() {
                     onClick={handleBackToBidding}
                     className="mt-4 w-full rounded-[1.4rem] border border-white/10 bg-white/5 px-5 py-4 text-right text-base font-black text-slate-200 transition hover:bg-white/10"
                   >
-                    العودة للمزايدة وتعديل الإعلان
+                    رجوع لتعديل العدد
                   </button>
                 </div>
               </section>
@@ -611,7 +617,7 @@ export default function Round2() {
                   تحكم المؤقت
                 </div>
                 <div className="mt-2 text-sm text-slate-500">
-                  استخدمه أثناء الإعلان أو أثناء تنفيذ التحدي بحسب سير المزاد.
+                  شغّل الوقت أو أوقفه من هنا.
                 </div>
               </div>
 
@@ -643,7 +649,7 @@ export default function Round2() {
                   تحكم النقاط
                 </div>
                 <div className="mt-2 text-sm text-slate-500">
-                  استخدمه فقط إذا احتجت تصحيح النتيجة الحالية بسرعة.
+                  استخدمه فقط إذا احتجت تصحيحاً سريعاً.
                 </div>
               </div>
 
@@ -662,7 +668,7 @@ export default function Round2() {
             <section className="rounded-[2rem] border border-white/10 bg-slate-950/75 p-5 shadow-[0_24px_70px_rgba(15,23,42,0.35)] backdrop-blur-xl md:p-7">
               <div className="mb-5 text-right">
                 <div className="text-[0.7rem] font-black uppercase tracking-[0.35em] text-slate-400">
-                  بطاقات اللاعبين
+                  اللاعبون
                 </div>
               </div>
 
@@ -735,31 +741,14 @@ export default function Round2() {
             </section>
 
             <section className="rounded-[2rem] border border-white/10 bg-slate-950/75 p-5 shadow-[0_24px_70px_rgba(15,23,42,0.35)] backdrop-blur-xl md:p-7">
-              <div className="mb-5 text-right">
+              <div className="mb-4 text-right">
                 <div className="text-[0.7rem] font-black uppercase tracking-[0.35em] text-slate-400">
-                  حالة الجولة
+                  آخر نتيجة
                 </div>
               </div>
 
-              <div className="grid gap-4 text-right">
-                <div className="rounded-[1.4rem] border border-white/10 bg-white/5 p-4">
-                  <div className="text-sm font-bold text-slate-400">
-                    الوضع الحالي
-                  </div>
-                  <div className="mt-2 text-xl font-black text-white">
-                    {isBiddingPhase
-                      ? "بانتظار تثبيت المزاد"
-                      : `التحدي مع ${players[current].name}`}
-                  </div>
-                </div>
-                <div className="rounded-[1.4rem] border border-white/10 bg-white/5 p-4">
-                  <div className="text-sm font-bold text-slate-400">
-                    آخر نتيجة
-                  </div>
-                  <div className="mt-2 text-base font-bold text-white">
-                    {lastOutcomeLabel}
-                  </div>
-                </div>
+              <div className="rounded-[1.4rem] border border-white/10 bg-white/5 p-4 text-right text-base font-bold text-white">
+                {lastOutcomeLabel}
               </div>
             </section>
           </aside>
@@ -770,29 +759,29 @@ export default function Round2() {
           shortcuts={[
             {
               keys: `${formatShortcutLabel(shortcuts.incrementValue)} / ${formatShortcutLabel(shortcuts.decrementValue)}`,
-              label: "رفع أو خفض العدد الحالي",
+              label: "رفع أو خفض العدد",
             },
             {
               keys: `${formatShortcutLabel(globalShortcuts.playerOne)} / ${formatShortcutLabel(globalShortcuts.playerTwo)}`,
-              label: "تحديد اللاعب أو بدء التحدي له",
+              label: "ابدأ مع اللاعب 1 أو 2",
             },
             {
               keys: formatShortcutLabel(globalShortcuts.timerToggle),
-              label: "تشغيل أو إيقاف المؤقت",
+              label: "تشغيل أو إيقاف الوقت",
             },
             {
               keys: formatShortcutLabel(globalShortcuts.confirmAction),
-              label: "بدء التحدي أو اعتماد النجاح",
+              label: "اعتماد النجاح",
             },
             {
               keys: `${formatShortcutLabel(globalShortcuts.markMistake)} / ${formatShortcutLabel(shortcuts.markUnderHalf)} / ${formatShortcutLabel(shortcuts.backToBidding)}`,
-              label: "خطأ / أقل من النصف / عودة للمزايدة",
+              label: "خطأ / أقل من النصف / رجوع",
             },
           ]}
           tips={[
-            "الاختصارات تتوقف تلقائياً أثناء الكتابة داخل موضوع المزاد.",
-            "ثبّت العدد أولاً ثم اختر اللاعب الصحيح ليظهر الـ popup مباشرة.",
-            "راجع مؤشر الحسم قبل اعتماد النتيجة لتقليل أخطاء المشغّل.",
+            "ابدأ بكتابة الموضوع أو اختياره من القائمة.",
+            "حدد العدد أولاً ثم اختر اللاعب الذي سيبدأ التحدي.",
+            "بعد العد اختر النتيجة المناسبة مباشرة.",
           ]}
           onPrev={prevRound}
           onNext={nextRound}
