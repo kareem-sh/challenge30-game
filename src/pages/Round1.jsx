@@ -1,4 +1,4 @@
-import { useEffect, useEffectEvent, useRef, useState } from "react";
+import { useEffect, useEffectEvent } from "react";
 import { useGameStore } from "../app/gameStore";
 import { useSettingsStore } from "../app/settingsStore";
 import { getRoundName } from "../app/roundUtils";
@@ -7,7 +7,7 @@ import {
   formatShortcutLabel,
   shouldIgnoreShortcutEvent,
 } from "../app/shortcutUtils";
-import RoundTimerDisplay from "../components/RoundTimerDisplay";
+// import RoundTimerDisplay from "../components/RoundTimerDisplay"; // COMMENTED: Timer disabled for manual Round 1
 import StrikeMeter from "../components/StrikeMeter";
 import PassMeter from "../components/PassMeter";
 import OperatorHelpPanel from "../components/OperatorHelpPanel";
@@ -25,6 +25,9 @@ export default function Round1() {
   const prevRound = useGameStore((s) => s.prevRound);
   const question = useGameStore((s) => s.question);
   const setQuestion = useGameStore((s) => s.setQuestion);
+  // COMMENTED: Not used since roundIndexStore and roundsOrderStore are commented
+  // const roundIndexStore = useGameStore((s) => s.roundIndex);
+  // const roundsOrderStore = useGameStore((s) => s.roundsOrder);
   const resetQuestion = useGameStore((s) => s.resetQuestion);
   const setCurrentPlayer = useGameStore((s) => s.setCurrentPlayer);
   const round1QuestionIndex = useGameStore((s) => s.round1QuestionIndex);
@@ -35,19 +38,18 @@ export default function Round1() {
     (s) => s.setRound1PlayerPassUsed,
   );
   const resetRound1Passes = useGameStore((s) => s.resetRound1Passes);
-  const globalTimer = useGameStore((s) => s.globalTimer);
-  const setGlobalTimer = useGameStore((s) => s.setGlobalTimer);
-  const timeRunning = useGameStore((s) => s.timeRunning);
-  const startTimer = useGameStore((s) => s.startTimer);
-  const restartGlobalTimer = useGameStore((s) => s.restartGlobalTimer);
-  const resetGlobalTimer = useGameStore((s) => s.resetGlobalTimer);
-  const pauseTimer = useGameStore((s) => s.pauseTimer);
+  // COMMENTED: Timer functionality disabled for manual Round 1
+  // const globalTimer = useGameStore((s) => s.globalTimer);
+  // const setGlobalTimer = useGameStore((s) => s.setGlobalTimer);
+  // const timeRunning = useGameStore((s) => s.timeRunning);
+  // const startTimer = useGameStore((s) => s.startTimer);
+  // const restartGlobalTimer = useGameStore((s) => s.restartGlobalTimer);
+  // const resetGlobalTimer = useGameStore((s) => s.resetGlobalTimer);
+  // const pauseTimer = useGameStore((s) => s.pauseTimer);
   const triggerMistakeSound = useGameStore((s) => s.triggerMistakeSound);
-  const globalTimerNaturalEndToken = useGameStore(
-    (s) => s.globalTimerNaturalEndToken,
-  );
-  const roundIndexStore = useGameStore((s) => s.roundIndex);
-  const roundsOrderStore = useGameStore((s) => s.roundsOrder);
+  // const globalTimerNaturalEndToken = useGameStore(
+  //   (s) => s.globalTimerNaturalEndToken,
+  // );
   const settings = useSettingsStore((s) => s.round1);
   const allSettings = useSettingsStore();
 
@@ -67,28 +69,30 @@ export default function Round1() {
   const globalShortcuts = allSettings.globalShortcuts;
   const currentPlayerPassUsed = Number(round1PassUsed[current] || 0);
   const currentPlayerHasPass = currentPlayerPassUsed < passLimit;
-  const [timeExpired, setTimeExpired] = useState(false);
-  const prevNaturalEndToken = useRef(globalTimerNaturalEndToken);
+  // COMMENTED: Timer functionality disabled for manual Round 1
+  // const [timeExpired, setTimeExpired] = useState(false);
+  // const prevNaturalEndToken = useRef(globalTimerNaturalEndToken);
 
-  useEffect(() => {
-    if (globalTimerNaturalEndToken === prevNaturalEndToken.current) {
-      return;
-    }
-    prevNaturalEndToken.current = globalTimerNaturalEndToken;
-
-    if (roundsOrderStore[roundIndexStore] !== 1) return;
-    if (questionResolved || !isQuestionReady) return;
-
-    queueMicrotask(() => {
-      setTimeExpired(true);
-    });
-  }, [
-    globalTimerNaturalEndToken,
-    isQuestionReady,
-    questionResolved,
-    roundIndexStore,
-    roundsOrderStore,
-  ]);
+  // COMMENTED: Timer functionality disabled for manual Round 1
+  // useEffect(() => {
+  //   if (globalTimerNaturalEndToken === prevNaturalEndToken.current) {
+  //     return;
+  //   }
+  //   prevNaturalEndToken.current = globalTimerNaturalEndToken;
+  //
+  //   if (roundsOrderStore[roundIndexStore] !== 1) return;
+  //   if (questionResolved || !isQuestionReady) return;
+  //
+  //   queueMicrotask(() => {
+  //     setTimeExpired(true);
+  //   });
+  // }, [
+  //   globalTimerNaturalEndToken,
+  //   isQuestionReady,
+  //   questionResolved,
+  //   roundIndexStore,
+  //   roundsOrderStore,
+  // ]);
   const scoresAlreadyReset = players.every(
     (player) => Number(player.score || 0) === 0,
   );
@@ -99,71 +103,88 @@ export default function Round1() {
     ? question
     : "";
 
-  const prepareTimer = () => {
-    resetGlobalTimer(settings.time);
-  };
+  // COMMENTED: Timer functionality disabled for manual Round 1
+  // const prepareTimer = () => {
+  //   // Reset the global timer to the Round 1 time setting
+  //   resetGlobalTimer(settings.time);
+  // };
+  //
+  // // Start or resume the timer if question is ready and not expired
+  // const handleStartOrResume = () => {
+  //   if (!isQuestionReady || questionResolved || timeExpired) return;
+  //
+  //   // Initialize or restart timer if it's at 0 or has been reset
+  //   if (globalTimer <= 0 || globalTimer > settings.time) {
+  //     prepareTimer();
+  //   }
+  //
+  //   setTimeExpired(false);
+  //   // Begin the countdown
+  //   startTimer();
+  // };
+  //
+  // // Toggle timer between running and paused states
+  // const handleToggleTimer = () => {
+  //   if (timeRunning) {
+  //     // Pause the countdown timer
+  //     pauseTimer();
+  //     return;
+  //   }
+  //
+  //   // Resume or start the timer
+  //   handleStartOrResume();
+  // };
 
-  const handleStartOrResume = () => {
-    if (!isQuestionReady || questionResolved || timeExpired) return;
-
-    if (globalTimer <= 0 || globalTimer > settings.time) {
-      prepareTimer();
-    }
-
-    setTimeExpired(false);
-    startTimer();
-  };
-
-  const handleToggleTimer = () => {
-    if (timeRunning) {
-      pauseTimer();
-      return;
-    }
-
-    handleStartOrResume();
-  };
-
+  // Switch to the other player
   const handleSwitch = () => {
     if (!isQuestionReady || questionResolved) return;
 
-    setTimeExpired(false);
+    // COMMENTED: Timer functionality disabled for manual Round 1
+    // setTimeExpired(false);
     switchPlayer();
-    restartGlobalTimer(settings.time);
+    // // Restart the timer back to full time for the new player
+    // restartGlobalTimer(settings.time);
   };
 
+  // Record a strike/mistake for the current player - MANUAL STRIKES, AUTO-POINTS SYSTEM
+  // AUTO-POINTS RULE: When one player reaches 3 strikes, the other player automatically gets points
+  // Perfect win (0 strikes): 2 points | Normal win (1+ strikes): 1 point
   const handleStrike = () => {
     if (!isQuestionReady || questionResolved) return;
 
-    setTimeExpired(false);
     addStrike(current);
     triggerMistakeSound(current);
 
     const state = useGameStore.getState();
     const updatedPlayers = state.players;
 
+    // AUTO-POINTS: Check if current player reached 3 strikes (mistake limit)
+    // If so, award points to the other player automatically based on their strike count
     if (updatedPlayers[current].strikes >= settings.mistakes) {
-      const points =
+      // Award perfect points (2) if winner has 0 strikes, normal points (1) otherwise
+      const pointsToAward =
         updatedPlayers[other].strikes === 0
           ? settings.perfectPoint
           : settings.normalPoint;
-
-      addScore(other, points);
+      addScore(other, pointsToAward);
       setCurrentPlayer(other);
-      restartGlobalTimer(settings.time);
       return;
     }
 
+    // Switch to other player (strikes are manual, no timer)
     switchPlayer();
-    restartGlobalTimer(settings.time);
   };
 
+  // Pass the turn to the other player without using a strike
   const handlePassTurn = () => {
     if (!isQuestionReady || questionResolved || !currentPlayerHasPass) return;
 
-    setTimeExpired(false);
+    // COMMENTED: Timer functionality disabled for manual Round 1
+    // setTimeExpired(false);
     markRound1PassUsed(current);
     switchPlayer();
-    restartGlobalTimer(settings.time);
+    // // Restart the timer for the other player
+    // restartGlobalTimer(settings.time);
   };
 
   const handleManualStrikeChange = (playerIndex, delta) => {
@@ -178,7 +199,24 @@ export default function Round1() {
 
     if (nextStrikes === player.strikes) return;
 
+    // Update the strikes
     setPlayerStrikes(playerIndex, nextStrikes);
+
+    // Check if the player who gained strikes reached the mistake limit
+    if (
+      nextStrikes >= settings.mistakes &&
+      Number(player.strikes || 0) < settings.mistakes
+    ) {
+      // This player just reached 3 strikes - award points to the other player
+      const opponentIndex = playerIndex === 0 ? 1 : 0;
+      const state = useGameStore.getState();
+      const opponentStrikes = state.players[opponentIndex].strikes;
+
+      // Award perfect points (2) if opponent has 0 strikes, normal points (1) otherwise
+      const pointsToAward =
+        opponentStrikes === 0 ? settings.perfectPoint : settings.normalPoint;
+      addScore(opponentIndex, pointsToAward);
+    }
   };
 
   const handleManualScoreChange = (playerIndex, delta) => {
@@ -201,8 +239,9 @@ export default function Round1() {
   };
 
   const finishCurrentQuestion = () => {
-    pauseTimer();
-    setTimeExpired(false);
+    // COMMENTED: Timer functionality disabled for manual Round 1
+    // pauseTimer();
+    // setTimeExpired(false);
     resetQuestion(settings.time);
 
     if (round1QuestionIndex < settings.questionsCount) {
@@ -210,16 +249,17 @@ export default function Round1() {
     }
   };
 
-  const handleResetTimer = () => {
-    pauseTimer();
-    resetGlobalTimer(settings.time);
-  };
-
-  useEffect(() => {
-    if (globalTimer > settings.time) {
-      setGlobalTimer(settings.time);
-    }
-  }, [globalTimer, setGlobalTimer, settings.time]);
+  // COMMENTED: Timer functionality disabled for manual Round 1
+  // const handleResetTimer = () => {
+  //   pauseTimer();
+  //   resetGlobalTimer(settings.time);
+  // };
+  //
+  // useEffect(() => {
+  //   if (globalTimer > settings.time) {
+  //     setGlobalTimer(settings.time);
+  //   }
+  // }, [globalTimer, setGlobalTimer, settings.time]);
 
   const onGlobalKeydown = useEffectEvent((event) => {
     if (shouldIgnoreShortcutEvent(event)) {
@@ -244,11 +284,12 @@ export default function Round1() {
       return;
     }
 
-    if (eventMatchesShortcut(event, globalShortcuts.timerToggle)) {
-      event.preventDefault();
-      handleToggleTimer();
-      return;
-    }
+    // COMMENTED: Timer toggle disabled for manual Round 1
+    // if (eventMatchesShortcut(event, globalShortcuts.timerToggle)) {
+    //   event.preventDefault();
+    //   handleToggleTimer();
+    //   return;
+    // }
 
     if (eventMatchesShortcut(event, globalShortcuts.confirmAction)) {
       event.preventDefault();
@@ -263,20 +304,17 @@ export default function Round1() {
     return () => window.removeEventListener("keydown", handleKeydown);
   }, []);
 
-  useEffect(() => {
-    if (!questionResolved) return;
-    pauseTimer();
-  }, [pauseTimer, questionResolved]);
+  // COMMENTED: Timer functionality disabled for manual Round 1
+  // useEffect(() => {
+  //   if (!questionResolved) return;
+  //   pauseTimer();
+  // }, [pauseTimer, questionResolved]);
 
   const statusMessage = questionResolved
     ? `تم حسم السؤال لصالح ${players[winnerIndex]?.name || ""}`
-    : timeExpired
-      ? `انتهى وقت ${players[current].name}. استخدم التبديل أو التمرير لمتابعة الدور بدون خطأ، أو خطأ لتسجيل خطأ وبدء الوقت للاعب الآخر.`
-      : timeRunning
-        ? `الدور الآن على ${players[current].name}`
-        : isQuestionReady
-          ? "السؤال جاهز ويمكنك بدء العدّاد"
-          : "أدخل موضوع السؤال أولاً";
+    : isQuestionReady
+      ? "السؤال جاهز - الجولة الآن يدوية بدون مؤقت"
+      : "أدخل موضوع السؤال أولاً";
 
   return (
     <div
@@ -370,9 +408,7 @@ export default function Round1() {
                     "rounded-full px-4 py-2 text-sm font-bold",
                     questionResolved
                       ? "bg-emerald-500/15 text-emerald-300"
-                      : timeRunning
-                        ? "bg-cyan-500/15 text-cyan-200"
-                        : "bg-white/5 text-slate-300",
+                      : "bg-white/5 text-slate-300", // COMMENTED: Timer state removed for manual Round 1
                   ].join(" ")}
                 >
                   {statusMessage}
@@ -417,23 +453,23 @@ export default function Round1() {
               />
 
               <div className="mt-5 flex flex-col gap-3 lg:flex-row">
-                <button
+                {/* COMMENTED: Timer functionality disabled for manual Round 1 */}
+                {/* <button
                   onClick={handleStartOrResume}
                   disabled={!isQuestionReady || questionResolved}
                   className="flex-1 rounded-[1.5rem] bg-gradient-to-l from-cyan-400 to-sky-300 px-6 py-5 text-xl font-black text-slate-950 shadow-[0_18px_40px_rgba(34,211,238,0.28)] transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   {timeRunning ? "العدّاد يعمل الآن" : "بدء السؤال"}
-                </button>
+                </button> */}
                 <button
                   onClick={() => {
-                    pauseTimer();
-                    resetGlobalTimer(settings.time);
+                    // COMMENTED: Timer reset disabled for manual Round 1 (pauseTimer, resetGlobalTimer)
                     resetStrikes();
                     resetRound1Passes();
                   }}
                   className="rounded-[1.5rem] border border-white/10 bg-white/5 px-6 py-5 text-lg font-black text-white transition hover:bg-white/10"
                 >
-                  تصفير الوقت والأخطاء والتمرير
+                  تصفير الأخطاء والتمرير
                 </button>
               </div>
             </section>
@@ -583,10 +619,11 @@ export default function Round1() {
           </div>
 
           <aside className="space-y-6">
-            <RoundTimerDisplay
+            {/* COMMENTED: Timer functionality disabled for manual Round 1 */}
+            {/* <RoundTimerDisplay
               totalSeconds={settings.time}
               label="مؤقت الدور الحالي"
-            />
+            /> */}
 
             <section className="rounded-[2rem] border border-white/10 bg-slate-950/75 p-5 shadow-[0_24px_70px_rgba(15,23,42,0.35)] backdrop-blur-xl md:p-7">
               <div className="mb-5 text-right">
@@ -625,7 +662,9 @@ export default function Round1() {
                   <button
                     onClick={handlePassTurn}
                     disabled={
-                      !isQuestionReady || questionResolved || !currentPlayerHasPass
+                      !isQuestionReady ||
+                      questionResolved ||
+                      !currentPlayerHasPass
                     }
                     className="rounded-[1.5rem] border border-violet-300/20 bg-violet-400/10 px-5 py-5 text-right text-lg font-black text-violet-100 transition hover:bg-violet-400/15 disabled:cursor-not-allowed disabled:opacity-40"
                   >
@@ -637,7 +676,8 @@ export default function Round1() {
                     </div>
                   </button>
 
-                  <button
+                  {/* COMMENTED: Timer functionality disabled for manual Round 1 */}
+                  {/* <button
                     onClick={handleToggleTimer}
                     disabled={!isQuestionReady || questionResolved}
                     className="rounded-[1.5rem] border border-amber-300/20 bg-amber-300/10 px-5 py-5 text-right text-lg font-black text-amber-100 transition hover:bg-amber-300/15 disabled:cursor-not-allowed disabled:opacity-40 md:col-span-2"
@@ -656,7 +696,7 @@ export default function Round1() {
                     <div className="mt-2 text-xs font-semibold text-sky-100/80">
                       إعادة إلى {settings.time} ثانية
                     </div>
-                  </button>
+                  </button> */}
                 </div>
 
                 <button

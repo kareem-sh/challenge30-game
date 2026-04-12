@@ -3,8 +3,9 @@ import { useGameStore } from "../app/gameStore";
 import { useSettingsStore } from "../app/settingsStore";
 import { getRoundName } from "../app/roundUtils";
 import useSound from "use-sound";
-import Timer from "../components/Timer";
-import useRealtimeGlobalTimer from "../app/useRealtimeGlobalTimer";
+// COMMENTED: Timer functionality disabled for manual Round 1
+// import Timer from "../components/Timer";
+// import useRealtimeGlobalTimer from "../app/useRealtimeGlobalTimer";
 import PassMeter from "../components/PassMeter";
 
 export default function Scoreboard() {
@@ -18,22 +19,29 @@ export default function Scoreboard() {
   const auctionValue = useGameStore((s) => s.auctionValue);
   const mistakeTrigger = useGameStore((s) => s.mistakeTrigger);
   const lastMistakePlayer = useGameStore((s) => s.lastMistakePlayer);
-  const timeUpTrigger = useGameStore((s) => s.timeUpTrigger);
-  const timeRunning = useGameStore((s) => s.timeRunning);
+  // COMMENTED: Timer functionality disabled for manual Round 1
+  // const timeUpTrigger = useGameStore((s) => s.timeUpTrigger);
+  // const timeRunning = useGameStore((s) => s.timeRunning);
   const round2DeclaredValue = useGameStore((s) => s.round2DeclaredValue);
   const round2CorrectCount = useGameStore((s) => s.round2CorrectCount);
   const settings = useSettingsStore();
-  const realtimeGlobalTimer = useRealtimeGlobalTimer();
+  // COMMENTED: Timer functionality disabled for manual Round 1
+  // const realtimeGlobalTimer = useRealtimeGlobalTimer();
 
   const currentRound = roundsOrder[roundIndex];
   const currentRoundName = getRoundName(settings, currentRound);
   const mistakeLimit = currentRound === 1 ? settings.round1.mistakes : 3;
   const round1PassLimit = Math.max(1, Number(settings.round1.passCount) || 1);
-  const round1Progress = Math.min(
-    100,
-    (realtimeGlobalTimer / Math.max(settings.round1.time, 1)) * 100,
-  );
+  // COMMENTED: Round 1 timer progress disabled for manual Round 1
+  // Calculate Round 1 progress as a percentage: (current elapsed time / total round 1 time) * 100
+  // Used for the progress bar at the top of the scoreboard
+  // const round1Progress = Math.min(
+  //   100,
+  //   (realtimeGlobalTimer / Math.max(settings.round1.time, 1)) * 100,
+  // );
+  // Get the base time limit for Round 4 (used for player timer comparisons)
   const round4BaseTime = Math.max(settings.round4.time, 1);
+  // Check if the current player's time has expired in Round 4 (when time reaches 0)
   const round4ActivePlayerExpired =
     currentRound === 4 &&
     players[currentPlayer] &&
@@ -50,7 +58,8 @@ export default function Scoreboard() {
   });
 
   const lastMistakeTrigger = useRef(mistakeTrigger);
-  const lastTimeUpTrigger = useRef(timeUpTrigger);
+  // COMMENTED: Timer functionality disabled for manual Round 1
+  // const lastTimeUpTrigger = useRef(timeUpTrigger);
 
   useEffect(() => {
     return () => {
@@ -77,15 +86,26 @@ export default function Scoreboard() {
     players,
   ]);
 
-  useEffect(() => {
-    if (timeUpTrigger > lastTimeUpTrigger.current) {
-      if (currentRound === 1) {
-        playFail({ id: MISTAKE_SPRITE_ID });
-      }
-      lastTimeUpTrigger.current = timeUpTrigger;
-    }
-  }, [currentRound, playFail, timeUpTrigger]);
+  // COMMENTED: Time-up event disabled for manual Round 1
+  // useEffect(() => {
+  //   if (timeUpTrigger > lastTimeUpTrigger.current) {
+  //     if (currentRound === 1) {
+  //       // Play the failure/time-up sound effect
+  //       playFail({ id: MISTAKE_SPRITE_ID });
+  //     }
+  //     lastTimeUpTrigger.current = timeUpTrigger;
+  //   }
+  // }, [currentRound, playFail, timeUpTrigger]);
 
+  // COMMENTED: Timer format function disabled for manual Round 1
+  // Format seconds into mm:ss format (e.g., 2:45 for 165 seconds)
+  // const formatTime = (time) => {
+  //   const minutes = Math.floor(time / 60);
+  //   const seconds = time % 60;
+  //   return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  // };
+
+  // Fallback formatTime function for Round 4 (if needed)
   const formatTime = (time) => {
     const minutes = Math.floor(time / 60);
     const seconds = time % 60;
@@ -108,19 +128,19 @@ export default function Scoreboard() {
         }`}
       >
         <div className="absolute top-0 right-0 h-1 w-full bg-white/5 overflow-hidden">
-          <div
-            className={`ml-auto h-full transition-[width] duration-300 ${
-              currentRound === 1
-                ? "bg-gradient-to-l from-purple-500 to-pink-500"
-                : "bg-gradient-to-l from-yellow-500 to-orange-500"
-            }`}
-            style={{
-              width:
+          {/* COMMENTED: Progress bar logic disabled for manual Round 1 */}
+          {currentRound !== 1 && (
+            <div
+              className={`ml-auto h-full transition-[width] duration-300 ${
                 currentRound === 1
-                  ? `${timeRunning ? round1Progress : round1Progress}%`
-                  : "100%",
-            }}
-          />
+                  ? "bg-gradient-to-l from-purple-500 to-pink-500"
+                  : "bg-gradient-to-l from-yellow-500 to-orange-500"
+              }`}
+              style={{
+                width: "100%", // COMMENTED: Removed timer-based calculation
+              }}
+            />
+          )}
         </div>
         <div className="flex flex-col items-start">
           <span
@@ -149,13 +169,14 @@ export default function Scoreboard() {
           </h1>
         </div>
 
-        {currentRound === 1 && (
+        {/* COMMENTED: Display Round 1 timer component disabled for manual Round 1 */}
+        {/* {currentRound === 1 && (
           <div className="bg-white text-black px-20 py-8 rounded-[30px] shadow-[0_0_50px_rgba(255,255,255,0.2)]">
             <div className="text-[7rem] md:text-[9rem] font-black italic tabular-nums leading-none">
               <Timer />
             </div>
           </div>
-        )}
+        )} */}
 
         {currentRound === 3 && (
           <div className="bg-white/5 backdrop-blur-3xl border border-white/10 px-6 md:px-10 py-5 md:py-7 rounded-[24px] md:rounded-[34px] min-w-[260px] md:min-w-[360px]">
@@ -241,6 +262,7 @@ export default function Scoreboard() {
                 : "bg-white/[0.02] border-white/5 opacity-50 grayscale-[0.5]"
             }`}
           >
+            {/* Round 4 player time progress bar: shows remaining time as a percentage of base time */}
             {currentRound === 4 && (
               <div className="absolute inset-x-0 top-0 h-3 bg-white/5 overflow-hidden">
                 <div
@@ -281,6 +303,7 @@ export default function Scoreboard() {
             </div>
 
             <div className="w-full flex flex-col items-center gap-6 md:gap-10 mt-8 md:mt-12">
+              {/* Round 4 player timer display: shows time in mm:ss format, turns red when < 30 seconds */}
               {currentRound === 4 ? (
                 <div
                   className={`text-[6rem] md:text-[9rem] leading-none font-black font-mono tracking-tighter ${
@@ -296,6 +319,7 @@ export default function Scoreboard() {
                   <div className="text-slate-500 text-[10px] md:text-sm font-black tracking-[0.5em] opacity-50 uppercase">
                     {currentPlayer === index ? "الحالي" : "جاهز"}
                   </div>
+                  {/* Round 2 auction label (no timer displayed here) */}
                   <div className="rounded-full border border-white/10 bg-white/5 px-8 py-3 text-lg md:text-2xl font-black text-yellow-200">
                     المزاد
                   </div>
@@ -378,14 +402,17 @@ export default function Scoreboard() {
         }`}
       >
         <div className="absolute top-0 right-0 h-1 w-full bg-white/5 overflow-hidden">
-          <div
-            className={`h-full ${
-              currentRound === 3
-                ? "bg-gradient-to-l from-rose-500 to-orange-300"
-                : "bg-gradient-to-l from-purple-500 to-pink-500 animate-[progress_15s_linear_infinite]"
-            }`}
-            style={currentRound === 3 ? { width: "100%" } : undefined}
-          />
+          {/* COMMENTED: Progress bar disabled - style placeholder */}
+          {currentRound !== 1 && (
+            <div
+              className={`ml-auto h-full transition-[width] duration-300 ${
+                currentRound === 3
+                  ? "bg-gradient-to-l from-rose-500 to-orange-300"
+                  : "bg-gradient-to-l from-purple-500 to-pink-500 animate-[progress_15s_linear_infinite]"
+              }`}
+              style={currentRound === 3 ? { width: "100%" } : undefined}
+            />
+          )}
         </div>
         <div className="flex flex-col items-start">
           <span
@@ -419,6 +446,7 @@ export default function Scoreboard() {
         </div>
       </div>
 
+      {/* Time-up alert modal for Round 4: shows when current player's time hits 0 */}
       {round4ActivePlayerExpired && (
         <div className="pointer-events-none absolute inset-0 z-40 flex items-center justify-center bg-slate-950/45 backdrop-blur-sm">
           <div className="w-[84%] max-w-3xl rounded-[3rem] border border-red-400/30 bg-slate-950/94 p-8 text-center shadow-[0_40px_120px_rgba(0,0,0,0.8)] md:p-12">
