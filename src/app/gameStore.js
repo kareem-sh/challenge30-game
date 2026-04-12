@@ -65,8 +65,7 @@ export const useGameStore = create(
           lastMistakePlayer: player,
         }),
 
-      triggerTimeUpSound: () =>
-        set({ timeUpTrigger: get().timeUpTrigger + 1 }),
+      triggerTimeUpSound: () => set({ timeUpTrigger: get().timeUpTrigger + 1 }),
 
       bumpGlobalTimerNaturalEnd: () =>
         set((state) => ({
@@ -84,8 +83,10 @@ export const useGameStore = create(
       setQuestion: (q) => set({ question: q, isQuestionStarted: false }),
       setRound1QuestionIndex: (value) => set({ round1QuestionIndex: value }),
       setRound2Phase: (phase) => set({ round2Phase: phase }),
-      setRound2DeclaredValue: (value) => set({ round2DeclaredValue: Math.max(0, value) }),
-      setRound2CorrectCount: (value) => set({ round2CorrectCount: Math.max(0, value) }),
+      setRound2DeclaredValue: (value) =>
+        set({ round2DeclaredValue: Math.max(0, value) }),
+      setRound2CorrectCount: (value) =>
+        set({ round2CorrectCount: Math.max(0, value) }),
       setRound2PlayerDeclaration: (playerIndex, value) => {
         const round2DeclaredByPlayer = [...get().round2DeclaredByPlayer];
         round2DeclaredByPlayer[playerIndex] = Math.max(0, value);
@@ -107,7 +108,8 @@ export const useGameStore = create(
         })),
       markRound1PassUsed: (playerIndex) => {
         const round1PassUsed = [...get().round1PassUsed];
-        round1PassUsed[playerIndex] = Number(round1PassUsed[playerIndex] || 0) + 1;
+        round1PassUsed[playerIndex] =
+          Number(round1PassUsed[playerIndex] || 0) + 1;
         set({ round1PassUsed });
       },
       setRound1PlayerPassUsed: (playerIndex, usedCount) => {
@@ -127,7 +129,10 @@ export const useGameStore = create(
       },
 
       resetScores: () => {
-        const players = get().players.map((player) => ({ ...player, score: 0 }));
+        const players = get().players.map((player) => ({
+          ...player,
+          score: 0,
+        }));
         set({ players });
       },
 
@@ -150,7 +155,10 @@ export const useGameStore = create(
       },
 
       resetStrikes: () => {
-        const players = get().players.map((player) => ({ ...player, strikes: 0 }));
+        const players = get().players.map((player) => ({
+          ...player,
+          strikes: 0,
+        }));
         set({ players });
       },
 
@@ -230,7 +238,9 @@ export const useGameStore = create(
       setRoundsOrder: (order) => {
         const normalized = order
           .filter((roundNumber) => [1, 2, 3, 4].includes(roundNumber))
-          .filter((roundNumber, index, array) => array.indexOf(roundNumber) === index);
+          .filter(
+            (roundNumber, index, array) => array.indexOf(roundNumber) === index,
+          );
 
         if (normalized.length !== 4) return;
 
@@ -310,7 +320,8 @@ export const useGameStore = create(
 
         set((state) => ({
           globalTimer: nextValue,
-          globalTimerStartedAt: state.timeRunning && nextValue > 0 ? Date.now() : null,
+          globalTimerStartedAt:
+            state.timeRunning && nextValue > 0 ? Date.now() : null,
         }));
       },
 
@@ -336,6 +347,14 @@ export const useGameStore = create(
       resetTimes: (time) => {
         const players = get().players.map((player) => ({ ...player, time }));
         set({ players });
+      },
+
+      setPlayerTime: (playerIndex, time) => {
+        const players = [...get().players];
+        if (players[playerIndex]) {
+          players[playerIndex].time = Math.max(0, Number(time) || 0);
+          set({ players });
+        }
       },
 
       resetQuestion: (initialTime = 8) => {

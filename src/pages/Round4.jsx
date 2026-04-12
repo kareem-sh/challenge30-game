@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useGameStore } from "../app/gameStore";
 import { useSettingsStore } from "../app/settingsStore";
 import { getRoundName } from "../app/roundUtils";
@@ -18,6 +18,7 @@ export default function Round4() {
   const pauseTimer = useGameStore((s) => s.pauseTimer);
   const tick = useGameStore((s) => s.tick);
   const resetTimes = useGameStore((s) => s.resetTimes);
+  const setPlayerTime = useGameStore((s) => s.setPlayerTime);
   const addScore = useGameStore((s) => s.addScore);
   const nextRound = useGameStore((s) => s.nextRound);
   const prevRound = useGameStore((s) => s.prevRound);
@@ -29,6 +30,11 @@ export default function Round4() {
   const scoresAlreadyReset = players.every(
     (player) => Number(player.score || 0) === 0,
   );
+
+  const [timeInputs, setTimeInputs] = useState([
+    players[0]?.time || 0,
+    players[1]?.time || 0,
+  ]);
 
   useEffect(() => {
     const intervalId = window.setInterval(() => {
@@ -246,6 +252,46 @@ export default function Round4() {
                   }`}
                 >
                   {format(player.time)}
+                </div>
+
+                <div className="mt-6 flex flex-col items-center gap-3 rounded-[1.5rem] border border-white/10 bg-black/30 p-4">
+                  <div className="text-[0.65rem] font-black uppercase tracking-[0.3em] text-slate-400">
+                    تحديث الوقت
+                  </div>
+                  <div className="flex w-full flex-col gap-3">
+                    <div>
+                      <div className="mb-2 text-xs font-bold text-slate-400">
+                        الوقت الحالي
+                      </div>
+                      <div className="w-full rounded-lg border border-white/20 bg-slate-900/50 px-3 py-2 text-center font-black text-cyan-300">
+                        {player.time}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="number"
+                        value={timeInputs[index]}
+                        onChange={(e) => {
+                          const newInputs = [...timeInputs];
+                          newInputs[index] = e.target.value;
+                          setTimeInputs(newInputs);
+                        }}
+                        className="flex-1 rounded-lg border border-white/20 bg-slate-900 px-3 py-2 text-center font-black text-white placeholder-slate-500 outline-none transition focus:border-cyan-400"
+                        placeholder="أدخل الوقت الجديد"
+                        min="0"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const timeValue = Number(timeInputs[index]) || 0;
+                          setPlayerTime(index, timeValue);
+                        }}
+                        className="rounded-lg border border-cyan-400/30 bg-cyan-500/20 px-4 py-2 text-xs font-black text-cyan-100 transition hover:bg-cyan-500/30"
+                      >
+                        تحديث
+                      </button>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="mt-8 flex items-center justify-between gap-4">
