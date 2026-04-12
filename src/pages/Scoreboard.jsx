@@ -3,8 +3,7 @@ import { useGameStore } from "../app/gameStore";
 import { useSettingsStore } from "../app/settingsStore";
 import { getRoundName } from "../app/roundUtils";
 import useSound from "use-sound";
-// COMMENTED: Timer functionality disabled for manual Round 1
-// import Timer from "../components/Timer";
+import Timer from "../components/Timer";
 // import useRealtimeGlobalTimer from "../app/useRealtimeGlobalTimer";
 import PassMeter from "../components/PassMeter";
 
