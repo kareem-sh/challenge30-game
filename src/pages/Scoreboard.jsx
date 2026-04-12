@@ -31,6 +31,9 @@ export default function Scoreboard() {
   const currentRoundName = getRoundName(settings, currentRound);
   const mistakeLimit = currentRound === 1 ? settings.round1.mistakes : 3;
   const round1PassLimit = Math.max(1, Number(settings.round1.passCount) || 1);
+  const scoreboardPlayers = players
+    .map((player, index) => ({ player, index }))
+    .reverse();
   // COMMENTED: Round 1 timer progress disabled for manual Round 1
   // Calculate Round 1 progress as a percentage: (current elapsed time / total round 1 time) * 100
   // Used for the progress bar at the top of the scoreboard
@@ -252,7 +255,7 @@ export default function Scoreboard() {
           </div>
         )}
 
-        {players.map((player, index) => (
+        {scoreboardPlayers.map(({ player, index }) => (
           <div
             key={index}
             className={`relative rounded-[40px] md:rounded-[60px] p-8 md:p-16 transition-all duration-1000 flex flex-col items-center justify-between border shadow-2xl overflow-hidden ${
