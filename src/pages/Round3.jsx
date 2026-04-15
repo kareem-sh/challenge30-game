@@ -14,7 +14,6 @@ export default function Round3() {
   const current = useGameStore((s) => s.currentPlayer);
   const setCurrentPlayer = useGameStore((s) => s.setCurrentPlayer);
   const addScore = useGameStore((s) => s.addScore);
-  const resetScores = useGameStore((s) => s.resetScores);
   const nextRound = useGameStore((s) => s.nextRound);
   const prevRound = useGameStore((s) => s.prevRound);
   const settings = useSettingsStore((s) => s.round3);
@@ -22,9 +21,6 @@ export default function Round3() {
   const roundTitle = getRoundName(allSettings, 3);
   const shortcuts = settings.shortcuts;
   const globalShortcuts = allSettings.globalShortcuts;
-  const scoresAlreadyReset = players.every(
-    (player) => Number(player.score || 0) === 0,
-  );
 
   const awardPoints = (playerIndex, points) => {
     setCurrentPlayer(playerIndex);
@@ -184,16 +180,6 @@ export default function Round3() {
             ))}
           </div>
 
-          <button
-            onClick={resetScores}
-            disabled={scoresAlreadyReset}
-            className="mt-5 w-full rounded-[1.6rem] border border-rose-300/20 bg-rose-500/12 px-6 py-5 text-right text-lg font-black text-rose-100 transition hover:bg-rose-500/18 disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            تصفير النقاط
-            <div className="mt-2 text-sm font-semibold text-rose-100/80">
-              يعيد نقاط اللاعبين إلى صفر
-            </div>
-          </button>
         </section>
 
         <section className="grid gap-6 xl:grid-cols-2">

@@ -14,8 +14,6 @@ export default function Scoreboard() {
   const roundIndex = useGameStore((s) => s.roundIndex);
   const roundsOrder = useGameStore((s) => s.roundsOrder);
   const round1PassUsed = useGameStore((s) => s.round1PassUsed);
-  const showAuction = useGameStore((s) => s.showAuction);
-  const auctionValue = useGameStore((s) => s.auctionValue);
   const mistakeTrigger = useGameStore((s) => s.mistakeTrigger);
   const lastMistakePlayer = useGameStore((s) => s.lastMistakePlayer);
   // COMMENTED: Timer functionality disabled for manual Round 1
@@ -120,7 +118,7 @@ export default function Scoreboard() {
       <div className="absolute bottom-[-20%] left-[-10%] w-[600px] h-[600px] bg-pink-600/20 rounded-full blur-[150px] animate-pulse pointer-events-none" />
 
       <div
-        className={`transition-all duration-700 h-36 md:h-44 mb-10 bg-white/[0.03] backdrop-blur-3xl border border-white/10 rounded-[40px] flex items-center px-10 md:px-16 relative overflow-hidden ${
+        className={`transition-all duration-700 min-h-[16rem] md:min-h-[20rem] mb-10 bg-white/[0.03] backdrop-blur-3xl border border-white/10 rounded-[40px] flex items-center px-10 py-8 md:px-16 md:py-10 relative overflow-hidden ${
           currentRound === 1 || currentRound === 2
             ? "opacity-100 scale-100"
             : "opacity-0 scale-95 pointer-events-none absolute"
@@ -141,15 +139,8 @@ export default function Scoreboard() {
             />
           )}
         </div>
-        <div className="flex flex-col items-start">
-          <span
-            className={`font-black text-[10px] md:text-xs mb-2 tracking-[0.2em] uppercase ${
-              currentRound === 2 ? "text-yellow-400" : "text-purple-500"
-            }`}
-          >
-            {currentRound === 2 ? "التحدي الحالي" : "السؤال الحالي"}
-          </span>
-          <span className="text-5xl md:text-8xl font-bold text-white tracking-tight leading-tight">
+        <div className="flex flex-col items-start w-full">
+          <span className="text-6xl md:text-9xl font-bold text-white tracking-tight leading-tight">
             {question || "بانتظار التحدي القادم..."}
           </span>
         </div>
@@ -176,42 +167,6 @@ export default function Scoreboard() {
             </div>
           </div>
         )} */}
-
-        {currentRound === 3 && (
-          <div className="bg-white/5 backdrop-blur-3xl border border-white/10 px-6 md:px-10 py-5 md:py-7 rounded-[24px] md:rounded-[34px] min-w-[260px] md:min-w-[360px]">
-            <div className="text-center">
-              <div className="text-[10px] md:text-xs font-black tracking-[0.35em] text-rose-300 uppercase">
-                اللاعب الحالي
-              </div>
-              <div className="mt-3 text-3xl md:text-5xl font-black leading-tight text-white">
-                {players[currentPlayer]?.name || ""}
-              </div>
-              <div className="mt-4 text-lg md:text-2xl font-black text-rose-200">
-                وضع السرعة
-              </div>
-            </div>
-          </div>
-        )}
-
-        {currentRound === 4 && (
-          <div className="bg-white/5 backdrop-blur-3xl border border-white/10 px-6 md:px-10 py-5 md:py-7 rounded-[24px] md:rounded-[34px] min-w-[260px] md:min-w-[360px]">
-            <div className="text-center">
-              <div className="text-[10px] md:text-xs font-black tracking-[0.35em] text-cyan-300 uppercase">
-                اللاعب الحالي
-              </div>
-              <div className="mt-3 text-3xl md:text-5xl font-black leading-tight text-white">
-                {players[currentPlayer]?.name || ""}
-              </div>
-              <div
-                className={`mt-4 text-lg md:text-2xl font-black ${
-                  round4ActivePlayerExpired ? "text-red-300" : "text-cyan-200"
-                }`}
-              >
-                {round4ActivePlayerExpired ? "انتهى الوقت" : currentRoundName}
-              </div>
-            </div>
-          </div>
-        )}
 
         {currentRound !== 1 && (
           <div
@@ -255,7 +210,11 @@ export default function Scoreboard() {
         {players.map((player, index) => (
           <div
             key={index}
-            className={`relative rounded-[40px] md:rounded-[60px] p-8 md:p-16 transition-all duration-1000 flex flex-col items-center justify-between border shadow-2xl overflow-hidden ${
+            className={`relative transition-all duration-1000 flex flex-col items-center justify-between border shadow-2xl overflow-hidden ${
+              currentRound === 3
+                ? "rounded-[46px] md:rounded-[72px] p-10 md:p-20"
+                : "rounded-[40px] md:rounded-[60px] p-8 md:p-16 min-h-[560px] md:min-h-[760px]"
+            } ${
               currentPlayer === index
                 ? "bg-white/10 border-purple-500/50 scale-[1.02] shadow-[0_0_100px_rgba(168,85,247,0.2)]"
                 : "bg-white/[0.02] border-white/5 opacity-50 grayscale-[0.5]"
@@ -287,15 +246,24 @@ export default function Scoreboard() {
             </div>
 
             <div className="relative flex flex-col items-center">
-              <h2 className="text-4xl md:text-7xl font-black mb-8 md:mb-12 tracking-tight uppercase">
+              <h2
+                className={`font-black tracking-tight uppercase ${
+                  currentRound === 3
+                    ? "text-5xl md:text-8xl mb-10 md:mb-14"
+                    : "text-4xl md:text-7xl mb-8 md:mb-12"
+                }`}
+              >
                 {player.name}
               </h2>
 
               <div className="flex flex-col items-center relative">
-                <div className="text-slate-500 text-[10px] md:text-sm font-black tracking-[0.5em] mb-4 opacity-50 uppercase">
-                  النقاط
-                </div>
-                <div className="text-[12rem] md:text-[20rem] leading-[0.8] font-black tabular-nums tracking-tighter">
+                <div
+                  className={`leading-[0.8] font-black tabular-nums tracking-tighter ${
+                    currentRound === 3
+                      ? "text-[14rem] md:text-[24rem]"
+                      : "text-[12rem] md:text-[20rem]"
+                  }`}
+                >
                   {player.score}
                 </div>
               </div>
@@ -314,33 +282,8 @@ export default function Scoreboard() {
                   {formatTime(player.time)}
                 </div>
               ) : currentRound === 2 ? (
-                <div className="flex flex-col items-center gap-4">
-                  <div className="text-slate-500 text-[10px] md:text-sm font-black tracking-[0.5em] opacity-50 uppercase">
-                    {currentPlayer === index ? "الحالي" : "جاهز"}
-                  </div>
-                  {/* Round 2 auction label (no timer displayed here) */}
-                  <div className="rounded-full border border-white/10 bg-white/5 px-8 py-3 text-lg md:text-2xl font-black text-yellow-200">
-                    المزاد
-                  </div>
-                </div>
-              ) : currentRound === 3 ? (
-                <div className="flex flex-col items-center gap-4">
-                  <div className="text-slate-500 text-[10px] md:text-sm font-black tracking-[0.5em] opacity-50 uppercase">
-                    {currentPlayer === index
-                      ? "اللاعب الحالي"
-                      : "بانتظار النقاط"}
-                  </div>
-                  <div
-                    className={`rounded-full border px-8 py-3 text-lg md:text-2xl font-black ${
-                      currentPlayer === index
-                        ? "border-rose-300/30 bg-rose-400/10 text-rose-100"
-                        : "border-white/10 bg-white/5 text-slate-300"
-                    }`}
-                  >
-                    {currentPlayer === index ? "+1 / +2" : "Speed"}
-                  </div>
-                </div>
-              ) : (
+                <div />
+              ) : currentRound === 3 ? null : (
                 <div className="flex w-full flex-col items-center gap-5">
                   <div className="flex gap-4 md:gap-6 flex-row-reverse">
                     {[...Array(mistakeLimit)].map((_, mistakeIndex) => (
@@ -367,35 +310,17 @@ export default function Scoreboard() {
               )}
             </div>
 
-            {currentPlayer === index && (
-              <div className="absolute top-6 left-6 md:top-10 md:left-10 flex items-center gap-3">
-                <div className="w-3 h-3 md:w-4 md:h-4 bg-purple-500 rounded-full animate-ping" />
-                <span className="text-purple-400 font-black tracking-widest text-[10px] md:text-sm uppercase">
-                  الدور الحالي
-                </span>
-              </div>
-            )}
           </div>
         ))}
 
-        {showAuction && (
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 animate-[popup_0.5s_cubic-bezier(0.34,1.56,0.64,1)_forwards] w-[80%] max-w-2xl text-center">
-            <div className="bg-white p-12 md:p-24 rounded-[40px] md:rounded-[80px] shadow-[0_50px_150px_rgba(0,0,0,1)] border-[10px] border-yellow-500 flex flex-col items-center">
-              <span className="text-yellow-600 text-xl md:text-3xl font-black mb-6 uppercase tracking-widest">
-                المزايدة المعلنة
-              </span>
-              <div className="text-[10rem] md:text-[18rem] font-black text-black leading-none tracking-tighter tabular-nums">
-                {auctionValue}
-              </div>
-              <div className="h-4 w-48 bg-slate-900 mt-8 rounded-full" />
-            </div>
-          </div>
-        )}
       </div>
 
       <div
         className={`transition-all duration-700 mt-10 md:mt-16 h-24 md:h-36 bg-white/[0.03] backdrop-blur-3xl border-t border-white/5 rounded-[20px] md:rounded-[40px] flex items-center px-10 md:px-16 relative overflow-hidden ${
-          currentRound === 1
+          currentRound === 1 ||
+          currentRound === 2 ||
+          currentRound === 3 ||
+          currentRound === 4
             ? "opacity-0 translate-y-20 absolute"
             : "opacity-100 translate-y-0"
         }`}
@@ -405,11 +330,11 @@ export default function Scoreboard() {
           {currentRound !== 1 && (
             <div
               className={`ml-auto h-full transition-[width] duration-300 ${
-                currentRound === 3
-                  ? "bg-gradient-to-l from-rose-500 to-orange-300"
+                currentRound === 4
+                  ? "bg-gradient-to-l from-cyan-500 to-blue-400"
                   : "bg-gradient-to-l from-purple-500 to-pink-500 animate-[progress_15s_linear_infinite]"
               }`}
-              style={currentRound === 3 ? { width: "100%" } : undefined}
+              style={currentRound === 4 ? { width: "100%" } : undefined}
             />
           )}
         </div>
@@ -423,24 +348,20 @@ export default function Scoreboard() {
                   : "text-purple-500"
             }`}
           >
-            {currentRound === 3
-              ? "وضع السرعة"
-              : currentRound === 4
-                ? currentRoundName
-                : currentRound === 2
-                  ? "حالة التحدي"
-                  : "التحدي الحالي"}
+            {currentRound === 4
+              ? currentRoundName
+              : currentRound === 2
+                ? "حالة التحدي"
+                : "التحدي الحالي"}
           </span>
           <span className="text-2xl md:text-5xl font-bold text-white tracking-tight">
-            {currentRound === 3
-              ? `الدور الآن: ${players[currentPlayer]?.name || ""}`
-              : currentRound === 4
-                ? round4ActivePlayerExpired
-                  ? `انتهى وقت ${players[currentPlayer]?.name || ""}`
-                  : `الوقت يعمل الآن لـ ${players[currentPlayer]?.name || ""}`
-                : currentRound === 2
-                  ? `اللاعب الحالي: ${players[currentPlayer]?.name || ""}`
-                  : question || "بانتظار التحدي القادم..."}
+            {currentRound === 4
+              ? round4ActivePlayerExpired
+                ? `انتهى وقت ${players[currentPlayer]?.name || ""}`
+                : `الوقت يعمل الآن لـ ${players[currentPlayer]?.name || ""}`
+              : currentRound === 2
+                ? `اللاعب الحالي: ${players[currentPlayer]?.name || ""}`
+                : question || "بانتظار التحدي القادم..."}
           </span>
         </div>
       </div>
@@ -466,7 +387,6 @@ export default function Scoreboard() {
         dangerouslySetInnerHTML={{
           __html: `
             @keyframes progress { 0% { width: 0%; } 100% { width: 100%; } }
-            @keyframes popup { 0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
           `,
         }}
       />

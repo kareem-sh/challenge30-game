@@ -13,7 +13,6 @@ export default function Round4() {
   const players = useGameStore((s) => s.players);
   const current = useGameStore((s) => s.currentPlayer);
   const switchPlayer = useGameStore((s) => s.switchPlayer);
-  const resetScores = useGameStore((s) => s.resetScores);
   const startTimer = useGameStore((s) => s.startTimer);
   const pauseTimer = useGameStore((s) => s.pauseTimer);
   const tick = useGameStore((s) => s.tick);
@@ -27,9 +26,6 @@ export default function Round4() {
   const allSettings = useSettingsStore();
   const shortcuts = settings.shortcuts;
   const defaultPoint = settings.defaultPoint ?? 2;
-  const scoresAlreadyReset = players.every(
-    (player) => Number(player.score || 0) === 0,
-  );
 
   const [timeInputs, setTimeInputs] = useState([
     players[0]?.time || 0,
@@ -380,28 +376,6 @@ export default function Round4() {
             <div className="mt-3 text-sm font-bold text-slate-500">
               إعادة إلى {format(settings.time)} -{" "}
               {formatShortcutLabel(shortcuts.resetTimer)}
-            </div>
-          </button>
-        </section>
-
-        <section className="rounded-[2rem] border border-white/10 bg-slate-950/75 p-5 shadow-[0_24px_70px_rgba(15,23,42,0.35)] backdrop-blur-xl md:p-7">
-          <div className="mb-5 text-right">
-            <div className="text-[0.7rem] font-black uppercase tracking-[0.35em] text-slate-400">
-              تحكم النقاط
-            </div>
-            <div className="mt-2 text-sm text-slate-500">
-              التصفير هنا لا يغيّر أزمنة اللاعبين، فقط يعيد النتيجة إلى الصفر.
-            </div>
-          </div>
-
-          <button
-            onClick={resetScores}
-            disabled={scoresAlreadyReset}
-            className="w-full rounded-[1.6rem] border border-rose-300/20 bg-rose-500/12 px-6 py-5 text-right text-lg font-black text-rose-100 transition hover:bg-rose-500/18 disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            تصفير النقاط
-            <div className="mt-2 text-sm font-semibold text-rose-100/80">
-              يعيد نقاط اللاعبين إلى صفر
             </div>
           </button>
         </section>

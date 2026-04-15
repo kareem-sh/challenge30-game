@@ -15,7 +15,6 @@ export default function Round2() {
   const current = useGameStore((s) => s.currentPlayer);
   const setCurrentPlayer = useGameStore((s) => s.setCurrentPlayer);
   const addScore = useGameStore((s) => s.addScore);
-  const resetScores = useGameStore((s) => s.resetScores);
   const nextRound = useGameStore((s) => s.nextRound);
   const prevRound = useGameStore((s) => s.prevRound);
   const question = useGameStore((s) => s.question);
@@ -42,6 +41,7 @@ export default function Round2() {
   const setRound2LastOutcome = useGameStore((s) => s.setRound2LastOutcome);
   const settings = useSettingsStore((s) => s.round2);
   const allSettings = useSettingsStore();
+  const roundTime = 30;
 
   const other = current === 0 ? 1 : 0;
   const isBiddingPhase = round2Phase === "bidding";
@@ -63,9 +63,6 @@ export default function Round2() {
   const selectedBankQuestion = round2QuestionBank.includes(question)
     ? question
     : "";
-  const scoresAlreadyReset = players.every(
-    (player) => Number(player.score || 0) === 0,
-  );
 
   const handleTimerToggle = () => {
     if (timeRunning) {
@@ -78,14 +75,14 @@ export default function Round2() {
 
   const handleBackToBidding = () => {
     pauseTimer();
-    resetGlobalTimer(settings.time);
+    resetGlobalTimer(roundTime);
     setRound2CorrectCount(0);
     setRound2Phase("bidding");
   };
 
   const resetChallengeControls = () => {
     pauseTimer();
-    resetGlobalTimer(settings.time);
+    resetGlobalTimer(roundTime);
     setRound2CorrectCount(0);
     setRound2DeclaredValue(0);
     setRound2Phase("bidding");
@@ -93,7 +90,7 @@ export default function Round2() {
 
   const handleResetTimer = () => {
     pauseTimer();
-    resetGlobalTimer(settings.time);
+    resetGlobalTimer(roundTime);
   };
 
   const handleManualScoreChange = (playerIndex, delta) => {
@@ -112,7 +109,7 @@ export default function Round2() {
     setRound2Phase("challenge");
     setRound2LastOutcome(null);
     setAuction(round2DeclaredValue, playerIndex);
-    restartGlobalTimer(settings.time);
+    restartGlobalTimer(roundTime);
     window.setTimeout(() => hideAuction(), 2200);
   };
 
@@ -151,22 +148,6 @@ export default function Round2() {
     });
     resetChallengeControls();
   };
-
-  const lastOutcomeLabel = (() => {
-    if (!round2LastOutcome) {
-      return "بانتظار أول تحدٍ في المزاد";
-    }
-
-    if (round2LastOutcome.type === "success") {
-      return `${players[round2LastOutcome.player]?.name || ""} نجح وكسب ${round2LastOutcome.points} نقطة`;
-    }
-
-    if (round2LastOutcome.type === "underHalf") {
-      return `${players[round2LastOutcome.awardedTo]?.name || ""} كسب ${round2LastOutcome.points} نقطة بسبب أقل من نصف العدد`;
-    }
-
-    return `${players[round2LastOutcome.awardedTo]?.name || ""} كسب ${round2LastOutcome.points} نقطة بسبب خطأ في الأسماء`;
-  })();
 
   const onGlobalKeydown = useEffectEvent((event) => {
     if (shouldIgnoreShortcutEvent(event)) {
@@ -263,6 +244,11 @@ export default function Round2() {
     return () => window.removeEventListener("keydown", handleKeydown);
   }, []);
 
+  useEffect(() => {
+    pauseTimer();
+    resetGlobalTimer(roundTime);
+  }, [pauseTimer, resetGlobalTimer, roundTime]);
+
   return (
     <div
       className="relative mx-auto min-h-[calc(100svh-7rem)] w-full max-w-[1800px] overflow-hidden px-4 py-6 md:px-8 md:py-8 xl:px-10"
@@ -305,7 +291,7 @@ export default function Round2() {
                   زمن التحدي
                 </div>
                 <div className="mt-3 text-3xl font-black text-white">
-                  {settings.time} ث
+                  {roundTime} ث
                 </div>
               </div>
               <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
@@ -601,7 +587,7 @@ export default function Round2() {
 
           <aside className="space-y-6">
             <RoundTimerDisplay
-              totalSeconds={settings.time}
+              totalSeconds={roundTime}
               label={isBiddingPhase ? "مؤقت إعلان العدد" : "مؤقت التحدي"}
             />
 
@@ -632,31 +618,9 @@ export default function Round2() {
                   onClick={handleResetTimer}
                   className="rounded-[1.3rem] border border-yellow-300/20 bg-yellow-400/10 px-4 py-4 text-center text-base font-black text-yellow-100 transition hover:bg-yellow-400/15"
                 >
-                  إعادة {settings.time} ثانية
+                  إعادة {roundTime} ثانية
                 </button>
               </div>
-            </section>
-
-            <section className="rounded-[2rem] border border-white/10 bg-slate-950/75 p-5 shadow-[0_24px_70px_rgba(15,23,42,0.35)] backdrop-blur-xl md:p-7">
-              <div className="mb-5 text-right">
-                <div className="text-[0.7rem] font-black uppercase tracking-[0.35em] text-slate-400">
-                  تحكم النقاط
-                </div>
-                <div className="mt-2 text-sm text-slate-500">
-                  استخدمه فقط إذا احتجت تصحيح النتيجة الحالية بسرعة.
-                </div>
-              </div>
-
-              <button
-                onClick={resetScores}
-                disabled={scoresAlreadyReset}
-                className="w-full rounded-[1.5rem] border border-rose-300/20 bg-rose-500/12 px-5 py-5 text-right text-lg font-black text-rose-100 transition hover:bg-rose-500/18 disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                تصفير النقاط
-                <div className="mt-2 text-xs font-semibold text-rose-100/80">
-                  يعيد نقاط اللاعبين إلى صفر
-                </div>
-              </button>
             </section>
 
             <section className="rounded-[2rem] border border-white/10 bg-slate-950/75 p-5 shadow-[0_24px_70px_rgba(15,23,42,0.35)] backdrop-blur-xl md:p-7">
@@ -734,34 +698,6 @@ export default function Round2() {
               </div>
             </section>
 
-            <section className="rounded-[2rem] border border-white/10 bg-slate-950/75 p-5 shadow-[0_24px_70px_rgba(15,23,42,0.35)] backdrop-blur-xl md:p-7">
-              <div className="mb-5 text-right">
-                <div className="text-[0.7rem] font-black uppercase tracking-[0.35em] text-slate-400">
-                  حالة الجولة
-                </div>
-              </div>
-
-              <div className="grid gap-4 text-right">
-                <div className="rounded-[1.4rem] border border-white/10 bg-white/5 p-4">
-                  <div className="text-sm font-bold text-slate-400">
-                    الوضع الحالي
-                  </div>
-                  <div className="mt-2 text-xl font-black text-white">
-                    {isBiddingPhase
-                      ? "بانتظار تثبيت المزاد"
-                      : `التحدي مع ${players[current].name}`}
-                  </div>
-                </div>
-                <div className="rounded-[1.4rem] border border-white/10 bg-white/5 p-4">
-                  <div className="text-sm font-bold text-slate-400">
-                    آخر نتيجة
-                  </div>
-                  <div className="mt-2 text-base font-bold text-white">
-                    {lastOutcomeLabel}
-                  </div>
-                </div>
-              </div>
-            </section>
           </aside>
         </div>
 

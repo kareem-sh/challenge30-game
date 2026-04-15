@@ -328,58 +328,57 @@ export default function Round1() {
       </div>
 
       <div className="relative z-10 space-y-6">
-        <section className="rounded-[2rem] border border-white/10 bg-slate-950/80 p-5 shadow-[0_30px_80px_rgba(2,6,23,0.45)] backdrop-blur-xl md:p-7">
-          <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
-            <div className="space-y-4 text-right">
+        <section className="rounded-[1.6rem] border border-white/10 bg-slate-950/80 p-4 shadow-[0_24px_60px_rgba(2,6,23,0.4)] backdrop-blur-xl md:p-5">
+          <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+            <div className="space-y-3 text-right">
               <div className="flex flex-wrap items-center justify-end gap-3">
-                <span className="rounded-full border border-cyan-400/25 bg-cyan-400/10 px-4 py-2 text-[0.7rem] font-black uppercase tracking-[0.35em] text-cyan-200">
+                <span className="rounded-full border border-cyan-400/25 bg-cyan-400/10 px-3 py-1.5 text-[0.65rem] font-black uppercase tracking-[0.32em] text-cyan-200">
                   الجولة 1
                 </span>
-                <span className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-bold text-slate-300">
+                <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-slate-300">
                   السؤال {round1QuestionIndex} من {settings.questionsCount}
                 </span>
               </div>
               <div>
-                <h1 className="text-[clamp(2.2rem,4vw,4.8rem)] font-black tracking-tight text-white">
+                <h1 className="text-[clamp(1.7rem,3vw,3rem)] font-black tracking-tight text-white">
                   {roundTitle}
                 </h1>
-                <p className="mt-3 max-w-3xl text-base leading-7 text-slate-300 md:text-lg">
-                  واجهة تشغيل سريعة وواضحة للتقني، مع عرض حيّ للدور الحالي،
-                  الأخطاء، المؤقت، وحسم النقاط وفق إعدادات الجولة.
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300 md:text-base">
+                  عرض مختصر للدور الحالي والنقاط وإعدادات السؤال.
                 </p>
               </div>
             </div>
 
-            <div className="grid gap-3 text-right sm:grid-cols-3 xl:min-w-[560px]">
-              <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
+            <div className="grid grid-cols-2 gap-2 text-right sm:grid-cols-4 xl:min-w-[520px]">
+              <div className="rounded-[1rem] border border-white/10 bg-white/5 p-2.5">
                 <div className="text-[0.65rem] font-black uppercase tracking-[0.3em] text-slate-500">
                   زمن المحاولة
                 </div>
-                <div className="mt-3 text-3xl font-black text-white">
+                <div className="mt-1.5 text-xl font-black text-white">
                   {settings.time} ث
                 </div>
               </div>
-              <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
+              <div className="rounded-[1rem] border border-white/10 bg-white/5 p-2.5">
                 <div className="text-[0.65rem] font-black uppercase tracking-[0.3em] text-slate-500">
                   حد الأخطاء
                 </div>
-                <div className="mt-3 text-3xl font-black text-white">
+                <div className="mt-1.5 text-xl font-black text-white">
                   {settings.mistakes}
                 </div>
               </div>
-              <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
+              <div className="rounded-[1rem] border border-white/10 bg-white/5 p-2.5">
                 <div className="text-[0.65rem] font-black uppercase tracking-[0.3em] text-slate-500">
                   منح النقاط
                 </div>
-                <div className="mt-3 text-lg font-black text-white">
+                <div className="mt-1.5 text-sm font-black text-white">
                   {settings.normalPoint} / {settings.perfectPoint}
                 </div>
               </div>
-              <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4 sm:col-span-3 xl:col-span-1">
+              <div className="rounded-[1rem] border border-white/10 bg-white/5 p-2.5">
                 <div className="text-[0.65rem] font-black uppercase tracking-[0.3em] text-slate-500">
                   عدد التمريرات
                 </div>
-                <div className="mt-3 text-3xl font-black text-white">
+                <div className="mt-1.5 text-xl font-black text-white">
                   {settings.passCount}
                 </div>
                 <div className="mt-1 text-xs font-bold text-slate-400">
@@ -733,106 +732,6 @@ export default function Round1() {
               </div>
             </section>
 
-            <section className="rounded-[2rem] border border-white/10 bg-slate-950/75 p-5 shadow-[0_24px_70px_rgba(15,23,42,0.35)] backdrop-blur-xl md:p-7">
-              <div className="mb-5 text-right">
-                <div className="text-[0.7rem] font-black uppercase tracking-[0.35em] text-slate-400">
-                  تحكم يدوي بنتيجة الجولة
-                </div>
-                <div className="mt-2 text-sm text-slate-500">
-                  اضبط النقاط أو الأخطاء يدويًا إذا احتجت إلى تصحيح نتيجة
-                  السؤال.
-                </div>
-              </div>
-
-              <div className="grid gap-4">
-                {players.map((player, index) => (
-                  <div
-                    key={index}
-                    className="rounded-[1.6rem] border border-white/10 bg-white/5 p-4"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="text-right">
-                        <div className="text-xs font-black uppercase tracking-[0.3em] text-slate-500">
-                          {player.name}
-                        </div>
-                        <div className="mt-2 text-2xl font-black text-white">
-                          نقاط: {player.score}
-                        </div>
-                        <div className="mt-1 text-sm text-slate-400">
-                          أخطاء: {player.strikes}/{settings.mistakes}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                      <button
-                        onClick={() => handleManualScoreChange(index, 1)}
-                        className="rounded-[1.4rem] border border-emerald-300/20 bg-emerald-500/12 px-4 py-3 text-sm font-black text-emerald-100 transition hover:bg-emerald-500/18"
-                      >
-                        +1 نقطة
-                      </button>
-                      <button
-                        onClick={() => handleManualScoreChange(index, -1)}
-                        className="rounded-[1.4rem] border border-rose-300/20 bg-rose-500/12 px-4 py-3 text-sm font-black text-rose-100 transition hover:bg-rose-500/18"
-                      >
-                        -1 نقطة
-                      </button>
-                      <button
-                        onClick={() => handleManualStrikeChange(index, 1)}
-                        className="rounded-[1.4rem] border border-orange-300/20 bg-orange-500/12 px-4 py-3 text-sm font-black text-orange-100 transition hover:bg-orange-500/18"
-                      >
-                        +1 خطأ
-                      </button>
-                      <button
-                        onClick={() => handleManualStrikeChange(index, -1)}
-                        className="rounded-[1.4rem] border border-slate-300/20 bg-slate-100/12 px-4 py-3 text-sm font-black text-slate-100 transition hover:bg-slate-100/18"
-                      >
-                        -1 خطأ
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            <section className="rounded-[2rem] border border-white/10 bg-slate-950/75 p-5 shadow-[0_24px_70px_rgba(15,23,42,0.35)] backdrop-blur-xl md:p-7">
-              <div className="mb-5 text-right">
-                <div className="text-[0.7rem] font-black uppercase tracking-[0.35em] text-slate-400">
-                  حالة الجولة
-                </div>
-              </div>
-
-              <div className="grid gap-4 text-right">
-                <div className="rounded-[1.4rem] border border-white/10 bg-white/5 p-4">
-                  <div className="text-sm font-bold text-slate-400">
-                    اللاعب الحالي
-                  </div>
-                  <div className="mt-2 text-2xl font-black text-white">
-                    {players[current].name}
-                  </div>
-                </div>
-                <div className="rounded-[1.4rem] border border-white/10 bg-white/5 p-4">
-                  <div className="text-sm font-bold text-slate-400">
-                    السؤال التالي
-                  </div>
-                  <div className="mt-2 text-base font-bold text-white">
-                    {round1QuestionIndex < settings.questionsCount
-                      ? `متبقي ${settings.questionsCount - round1QuestionIndex} سؤال بعد الحالي`
-                      : "هذا هو السؤال الأخير في الجولة"}
-                  </div>
-                </div>
-                <div className="rounded-[1.4rem] border border-white/10 bg-white/5 p-4">
-                  <div className="text-sm font-bold text-slate-400">
-                    حالة الحسم
-                  </div>
-                  <div className="mt-2 text-base font-bold text-white">
-                    {questionResolved
-                      ? `${players[winnerIndex]?.name || "أحد اللاعبين"} كسب السؤال`
-                      : "السؤال ما زال مفتوحاً"}
-                  </div>
-                </div>
-              </div>
-            </section>
           </aside>
         </div>
 
