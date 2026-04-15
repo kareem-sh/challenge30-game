@@ -36,42 +36,55 @@ export default function OperatorHelpPanel({
     <section
       className={`rounded-[2rem] border p-5 backdrop-blur-xl md:p-7 ${tone.card}`}
     >
-      <div className="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
-        <div className="flex-1 text-right">
+      <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-3 text-right">
           <div className={`text-[0.7rem] font-black uppercase tracking-[0.35em] ${tone.badge}`}>
-            اختصارات وتلميحات
+            مساعدة سريعة
           </div>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-            {shortcuts.map((shortcut) => (
-              <div
-                key={`${shortcut.keys}-${shortcut.label}`}
-                className="rounded-[1.4rem] border border-white/10 bg-black/20 px-4 py-4 text-right"
-              >
-                <div
-                  className={`inline-flex rounded-full border px-3 py-1 text-xs font-black uppercase tracking-[0.25em] ${tone.key}`}
-                >
-                  {shortcut.keys}
-                </div>
-                <div className="mt-3 text-base font-black text-white">{shortcut.label}</div>
-              </div>
-            ))}
+          <div className="text-lg font-black text-white md:text-2xl">
+            الأزرار المهمة فقط
+          </div>
+          <div className="text-sm font-semibold text-slate-300">
+            استخدم الأزرار الكبيرة في الشاشة أولاً، والاختصارات فقط إذا كانت
+            أسهل لك.
           </div>
         </div>
 
-        <div className="w-full max-w-xl space-y-4">
-          <div className="text-right text-sm font-black text-white">نصائح تشغيل</div>
-          <div className="grid gap-3">
-            {tips.map((tip) => (
-              <div
-                key={tip}
-                className={`rounded-[1.3rem] border px-4 py-4 text-right text-sm font-bold ${tone.note}`}
-              >
-                {tip}
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          {shortcuts.map((shortcut) => (
+            <div
+              key={`${shortcut.keys}-${shortcut.label}`}
+              className="rounded-[1.4rem] border border-white/10 bg-black/20 px-4 py-4 text-right"
+            >
+              <div className="text-base font-black text-white">
+                {shortcut.label}
               </div>
-            ))}
-          </div>
+              <div
+                className={`mt-3 inline-flex rounded-full border px-3 py-1 text-xs font-black uppercase tracking-[0.22em] ${tone.key}`}
+              >
+                {shortcut.keys}
+              </div>
+            </div>
+          ))}
+        </div>
 
-          <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+          {tips.length > 0 ? (
+            <div className="grid gap-3">
+              {tips.map((tip) => (
+                <div
+                  key={tip}
+                  className={`rounded-[1.3rem] border px-4 py-4 text-right text-sm font-bold ${tone.note}`}
+                >
+                  {tip}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div />
+          )}
+
+          <div className="grid gap-3 sm:grid-cols-2 lg:min-w-[320px]">
             <button
               onClick={onPrev}
               className="rounded-[1.3rem] border border-white/10 bg-white/5 px-5 py-4 text-lg font-black text-white transition hover:bg-white/10"

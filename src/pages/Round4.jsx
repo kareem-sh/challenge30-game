@@ -122,14 +122,12 @@ export default function Round4() {
                   {roundTitle}
                 </h1>
                 <p className="mt-3 max-w-3xl text-base leading-7 text-slate-300 md:text-lg">
-                  نفس الواجهة الأساسية، لكن مع توضيح أقوى للاعب الحالي، تقدّم
-                  الوقت، وتنبيهات انتهاء أوضح حتى تكون إدارة الجولة أسرع وأقل
-                  عرضة للخطأ.
+                  شغّل الوقت للاعب الحالي وبدّل اللاعب عند انتهاء دوره.
                 </p>
               </div>
             </div>
 
-            <div className="grid gap-3 text-right sm:grid-cols-2 xl:grid-cols-4 xl:min-w-[620px]">
+            <div className="grid gap-3 text-right sm:grid-cols-3 xl:min-w-[620px]">
               <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
                 <div className="text-[0.65rem] font-black uppercase tracking-[0.3em] text-slate-500">
                   اللاعب الحالي
@@ -144,14 +142,6 @@ export default function Round4() {
                 </div>
                 <div className="mt-3 text-2xl font-black text-white">
                   {format(settings.time)}
-                </div>
-              </div>
-              <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
-                <div className="text-[0.65rem] font-black uppercase tracking-[0.3em] text-slate-500">
-                  النقطة الافتراضية
-                </div>
-                <div className="mt-3 text-2xl font-black text-white">
-                  +{defaultPoint}
                 </div>
               </div>
               <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
@@ -252,17 +242,9 @@ export default function Round4() {
 
                 <div className="mt-6 flex flex-col items-center gap-3 rounded-[1.5rem] border border-white/10 bg-black/30 p-4">
                   <div className="text-[0.65rem] font-black uppercase tracking-[0.3em] text-slate-400">
-                    تحديث الوقت
+                    تعديل الوقت عند الحاجة
                   </div>
                   <div className="flex w-full flex-col gap-3">
-                    <div>
-                      <div className="mb-2 text-xs font-bold text-slate-400">
-                        الوقت الحالي
-                      </div>
-                      <div className="w-full rounded-lg border border-white/20 bg-slate-900/50 px-3 py-2 text-center font-black text-cyan-300">
-                        {player.time}
-                      </div>
-                    </div>
                     <div className="flex items-center gap-2">
                       <input
                         type="number"
@@ -273,7 +255,7 @@ export default function Round4() {
                           setTimeInputs(newInputs);
                         }}
                         className="flex-1 rounded-lg border border-white/20 bg-slate-900 px-3 py-2 text-center font-black text-white placeholder-slate-500 outline-none transition focus:border-cyan-400"
-                        placeholder="أدخل الوقت الجديد"
+                        placeholder="ثواني"
                         min="0"
                       />
                       <button
@@ -290,25 +272,20 @@ export default function Round4() {
                   </div>
                 </div>
 
-                <div className="mt-8 flex items-center justify-between gap-4">
-                  <div className="rounded-full border border-white/10 bg-black/20 px-5 py-3 text-sm font-black text-slate-300">
-                    {Math.round(progress)}%
-                  </div>
-                  <div
-                    className={`rounded-full px-5 py-3 text-sm font-black ${
-                      isExpired
-                        ? "bg-red-500/15 text-red-200"
-                        : isActive
-                          ? "bg-cyan-400/15 text-cyan-100"
-                          : "bg-white/5 text-slate-400"
-                    }`}
-                  >
-                    {isExpired
-                      ? "توقف تلقائياً"
+                <div
+                  className={`mt-8 rounded-full px-5 py-3 text-center text-sm font-black ${
+                    isExpired
+                      ? "bg-red-500/15 text-red-200"
                       : isActive
-                        ? "الوقت ينقص الآن"
-                        : "بانتظار الدور"}
-                  </div>
+                        ? "bg-cyan-400/15 text-cyan-100"
+                        : "bg-white/5 text-slate-400"
+                  }`}
+                >
+                  {isExpired
+                    ? "انتهى الوقت"
+                    : isActive
+                      ? "الدور الحالي"
+                      : "بانتظار الدور"}
                 </div>
 
                 <div className="mt-8 grid gap-3 sm:grid-cols-2">
@@ -345,9 +322,7 @@ export default function Round4() {
               {running ? "إيقاف مؤقت" : "تشغيل"}
             </div>
             <div className="mt-3 text-sm font-bold opacity-80">
-              {running
-                ? `تجميد الوقت الحالي - ${formatShortcutLabel(shortcuts.pauseTimer)}`
-                : `بدء العداد للاعب الحالي - ${formatShortcutLabel(shortcuts.startTimer)}`}
+              {running ? "إيقاف الوقت الآن" : "ابدأ الوقت للاعب الحالي"}
             </div>
           </button>
 
@@ -359,7 +334,7 @@ export default function Round4() {
               تبديل اللاعب
             </div>
             <div className="mt-3 text-sm font-bold text-slate-300">
-              {formatShortcutLabel(shortcuts.switchPlayer)}
+              انقل الدور للاعب الآخر
             </div>
           </button>
 
@@ -374,8 +349,7 @@ export default function Round4() {
               إعادة الضبط
             </div>
             <div className="mt-3 text-sm font-bold text-slate-500">
-              إعادة إلى {format(settings.time)} -{" "}
-              {formatShortcutLabel(shortcuts.resetTimer)}
+              يعيد الوقت إلى {format(settings.time)}
             </div>
           </button>
         </section>
@@ -385,11 +359,11 @@ export default function Round4() {
           shortcuts={[
             {
               keys: formatShortcutLabel(shortcuts.switchPlayer),
-              label: "تبديل اللاعب مباشرة",
+              label: "تبديل اللاعب",
             },
             {
               keys: formatShortcutLabel(shortcuts.startTimer),
-              label: "تشغيل المؤقت",
+              label: "تشغيل الوقت",
             },
             {
               keys: formatShortcutLabel(shortcuts.pauseTimer),
@@ -402,8 +376,8 @@ export default function Round4() {
           ]}
           tips={[
             "الوقت ينقص فقط للاعب الحالي، لذلك بدّل اللاعب فور انتهاء دوره.",
-            "إذا انتهى الوقت سيظهر تنبيه واضح على الشاشتين قبل متابعة الجولة.",
-            "إعادة الضبط تعيد وقت الإعدادات لكلا اللاعبين وتحافظ على النقاط.",
+            "إذا انتهى الوقت سيظهر تنبيه واضح قبل المتابعة.",
+            "إعادة الضبط تعيد الوقت لكلا اللاعبين وتُبقي النقاط كما هي.",
           ]}
           onPrev={prevRound}
           onNext={nextRound}
@@ -420,7 +394,7 @@ export default function Round4() {
                 انتهى وقت {activePlayer?.name}
               </div>
               <div className="mt-4 text-lg font-bold text-slate-300">
-                أوقف الجولة أو أعد ضبط الوقت قبل المتابعة.
+                بدّل اللاعب أو أعد ضبط الوقت قبل المتابعة.
               </div>
             </div>
           </div>
